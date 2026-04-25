@@ -10,21 +10,21 @@ import 'package:moneywise/features/transactions/domain/i_transaction_repository.
 import 'package:moneywise/shared/providers/isar_provider.dart';
 
 final transactionRepositoryProvider = Provider<ITransactionRepository>((ref) {
-  final isar = ref.watch(isarProvider);
+  final isar = ref.watch(isarProvider).requireValue;
   return TransactionRepositoryImpl(isar);
 });
 
 final loanRepositoryProvider = Provider<ILoanRepository>((ref) {
-  final isar = ref.watch(isarProvider);
+  final isar = ref.watch(isarProvider).requireValue;
   return LoanRepositoryImpl(isar);
 });
 
 final categoryRepositoryProvider = Provider<ICategoryRepository>((ref) {
-  final isar = ref.watch(isarProvider);
+  final isar = ref.watch(isarProvider).requireValue;
   return CategoryRepositoryImpl(isar);
 });
 
 final budgetRepositoryProvider = Provider<IBudgetRepository>((ref) {
-  final isar = ref.watch(isarProvider);
+  final isar = ref.watch(isarProvider).requireValue;
   return BudgetRepositoryImpl(isar);
 });
