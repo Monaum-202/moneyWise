@@ -1,7 +1,7 @@
-import 'package:isar/isar.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:moneywise/shared/enums/transaction_type.dart';
+import 'package:isar/isar.dart';
 import 'package:moneywise/shared/enums/recurring_type.dart';
+import 'package:moneywise/shared/enums/transaction_type.dart';
 
 part 'transaction_model.freezed.dart';
 part 'transaction_model.g.dart';
@@ -46,11 +46,8 @@ class TransactionEntity with _$TransactionEntity {
     required TransactionType type,
     required String categoryId,
     required DateTime date,
-    String? note,
-    required bool isRecurring,
-    required RecurringType recurringType,
+    required bool isRecurring, required RecurringType recurringType, required DateTime createdAt, String? note,
     String? receiptImagePath,
-    required DateTime createdAt,
   }) = _TransactionEntity;
 
   factory TransactionEntity.fromJson(Map<String, dynamic> json) => _$TransactionEntityFromJson(json);

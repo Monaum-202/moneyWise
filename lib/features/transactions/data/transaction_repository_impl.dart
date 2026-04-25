@@ -7,9 +7,9 @@ import 'package:moneywise/shared/models/category_total.dart';
 import 'package:moneywise/shared/models/transaction_summary.dart';
 
 class TransactionRepositoryImpl implements ITransactionRepository {
-  final Isar isar;
 
   TransactionRepositoryImpl(this.isar);
+  final Isar isar;
 
   @override
   Stream<List<TransactionEntity>> watchAll({
@@ -18,7 +18,7 @@ class TransactionRepositoryImpl implements ITransactionRepository {
     String? categoryId,
     TransactionType? type,
   }) {
-    var query = isar.transactionModels.where();
+    final query = isar.transactionModels.where();
 
     return query
         .filter()
