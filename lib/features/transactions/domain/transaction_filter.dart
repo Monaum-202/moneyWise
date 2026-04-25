@@ -1,10 +1,6 @@
 import 'package:moneywise/shared/enums/transaction_type.dart';
 
 class TransactionFilter {
-  final TransactionType? type;
-  final int? categoryId;
-  final DateTime? startDate;
-  final DateTime? endDate;
 
   TransactionFilter({
     this.type,
@@ -12,4 +8,8 @@ class TransactionFilter {
     this.startDate,
     this.endDate,
   });
+  final TransactionType? type;
+  final int? categoryId;
+  final DateTime? startDate;
+  final DateTime? endDate;
 }
