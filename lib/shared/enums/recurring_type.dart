@@ -1,6 +1,1 @@
-enum RecurringType {
-  daily,
-  weekly,
-  monthly,
-  none;
-}
+enum RecurringType { none, daily, weekly, monthly }
