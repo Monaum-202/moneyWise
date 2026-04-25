@@ -1,5 +1,5 @@
-import 'package:isar/isar.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:isar/isar.dart';
 import 'package:moneywise/shared/enums/loan_type.dart';
 
 part 'loan_model.freezed.dart';
@@ -49,12 +49,9 @@ class LoanEntity with _$LoanEntity {
     required double amount,
     required LoanType type,
     required DateTime date,
-    DateTime? dueDate,
+    required bool isPaid, required DateTime createdAt, required List<RepaymentEntity> repayments, DateTime? dueDate,
     String? purpose,
-    required bool isPaid,
     DateTime? paidAt,
-    required DateTime createdAt,
-    required List<RepaymentEntity> repayments,
   }) = _LoanEntity;
 
   factory LoanEntity.fromJson(Map<String, dynamic> json) => _$LoanEntityFromJson(json);

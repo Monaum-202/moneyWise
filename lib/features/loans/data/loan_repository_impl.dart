@@ -5,9 +5,9 @@ import 'package:moneywise/shared/enums/loan_type.dart';
 import 'package:moneywise/shared/models/loan_summary.dart';
 
 class LoanRepositoryImpl implements ILoanRepository {
-  final Isar isar;
 
   LoanRepositoryImpl(this.isar);
+  final Isar isar;
 
   @override
   Stream<List<LoanEntity>> watchAll({LoanType? type, bool? isPaid}) {
@@ -77,8 +77,9 @@ class LoanRepositoryImpl implements ILoanRepository {
     await isar.writeTxn(() async {
       final loan = await isar.loanModels.where().uuidEqualTo(loanUuid).findFirst();
       if (loan != null) {
-        loan.isPaid = true;
-        loan.paidAt = DateTime.now();
+        loan
+          ..isPaid = true
+          ..paidAt = DateTime.now();
         await isar.loanModels.put(loan);
       }
     });
@@ -105,7 +106,7 @@ class LoanRepositoryImpl implements ILoanRepository {
     double totalGave = 0;
     double totalTook = 0;
     double totalOverdue = 0;
-    int overdueCount = 0;
+    var overdueCount = 0;
 
     for (final loan in loans) {
       final repaid = loan.repayments.fold(0.0, (sum, r) => sum + r.amount);
