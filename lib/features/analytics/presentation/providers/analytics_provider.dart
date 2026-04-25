@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:moneywise/features/categories/domain/category_model.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_list_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_list_provider.dart';
 import 'package:moneywise/shared/enums/transaction_type.dart';
@@ -12,12 +13,12 @@ Future<List<PieChartSectionData>> categoryPieData(CategoryPieDataRef ref) async 
   final transactions = await ref.watch(transactionListProvider().future);
   final categories = await ref.watch(categoryListProvider.future);
   
-  final totals = <int, double>{};
+  final totals = <String, double>{};
   double totalExpense = 0;
 
   for (final t in transactions) {
-    if (t.type == TransactionType.expense && t.categoryId != null) {
-      totals[t.categoryId!] = (totals[t.categoryId!] ?? 0) + t.amount;
+    if (t.type == TransactionType.expense) {
+      totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
       totalExpense += t.amount;
     }
   }
@@ -25,7 +26,13 @@ Future<List<PieChartSectionData>> categoryPieData(CategoryPieDataRef ref) async 
   if (totalExpense == 0) return [];
 
   return totals.entries.map((entry) {
-    final category = categories.firstWhere((c) => c.id == entry.key);
+    final category = categories.firstWhere(
+      (c) => c.uuid == entry.key,
+      orElse: () => Category()
+        ..name = 'Unknown'
+        ..colorValue = Colors.grey.toARGB32(),
+    );
+    
     return PieChartSectionData(
       value: entry.value,
       title: '${(entry.value / totalExpense * 100).toStringAsFixed(0)}%',
@@ -33,7 +40,7 @@ Future<List<PieChartSectionData>> categoryPieData(CategoryPieDataRef ref) async 
       radius: 50,
       showTitle: true,
     );
-  }).toList();
+  }).where((section) => section.value > 0).toList();
 }
 
 @riverpod

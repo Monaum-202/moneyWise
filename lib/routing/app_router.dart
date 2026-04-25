@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moneywise/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:moneywise/features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -6,7 +7,6 @@ import 'package:moneywise/features/loans/presentation/screens/loans_screen.dart'
 import 'package:moneywise/features/settings/presentation/screens/settings_screen.dart';
 import 'package:moneywise/routing/route_names.dart';
 import 'package:moneywise/shared/widgets/app_bottom_nav.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 

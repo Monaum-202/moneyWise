@@ -1,8 +1,8 @@
 class AppException implements Exception {
+  AppException(this.message, [this.code]);
+
   final String message;
   final String? code;
-
-  AppException(this.message, [this.code]);
 
   @override
   String toString() => 'AppException: $message ${code != null ? "($code)" : ""}';

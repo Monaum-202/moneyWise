@@ -3,12 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:moneywise/core/constants/app_strings.dart';
 
 class AppBottomNav extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
 
   const AppBottomNav({
-    super.key,
-    required this.navigationShell,
+    required this.navigationShell, super.key,
   });
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
