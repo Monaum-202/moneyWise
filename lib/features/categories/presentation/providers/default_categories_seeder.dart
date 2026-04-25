@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
+import 'package:moneywise/features/categories/domain/category_model.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_list_provider.dart';
-import 'package:moneywise/shared/models/category_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'default_categories_seeder.g.dart';
 
@@ -26,12 +26,16 @@ Future<void> categorySeeder(CategorySeederRef ref) async {
     ];
 
     for (final def in defaults) {
-      await repository.add(Category(
-        id: Isar.autoIncrement,
-        name: def.$1,
-        iconCodePoint: def.$2.codePoint,
-        colorValue: def.$3.value,
-      ));
+      final category = Category()
+        ..uuid = const Uuid().v4()
+        ..name = def.$1
+        ..iconCodePoint = def.$2.codePoint
+        ..colorValue = def.$3.toARGB32()
+        ..isCustom = false
+        ..isArchived = false
+        ..monthlyBudget = 0.0
+        ..createdAt = DateTime.now();
+      await repository.add(category);
     }
   }
 }

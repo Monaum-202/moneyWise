@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  final String message;
-  final IconData icon;
 
   const EmptyStateWidget({
-    super.key,
-    required this.message,
+    required this.message, super.key,
     this.icon = Icons.inbox_outlined,
   });
+  final String message;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
