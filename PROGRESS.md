@@ -1,85 +1,73 @@
-# Moneywise — Build Progress
+# Moneywise Project Progress
 
-## Status Legend
-- [ ] Not started
-- [~] In progress
-- [x] Complete
+## Part 1: Project Setup [x]
+- [x] Create Flutter project
+- [x] Configure folder structure
+- [x] Add dependencies
 
-## Parts
-- [x] Part 1: Project setup & pubspec.yaml
-- [x] Part 2: Architecture scaffold & folder structure
-- [x] Part 3: Data models (Freezed + Isar)
-- [x] Part 4: Database layer & repositories
-- [x] Part 5: Riverpod state management
-- [ ] Part 6: Core screens (Dashboard + Transactions)
-- [ ] Part 7: Loan module + Category module
-- [ ] Part 8: Analytics, Budget, Settings & PDF export
+## Part 2: Core Implementation [x]
+- [x] App Theme
+- [x] Logger Utility
+- [x] App Strings
 
-## Dependency Versions (auto-fill after pub get)
-| Package | Version |
-|---------|---------|
-| flutter_riverpod | ^2.5.1 |
-| riverpod_annotation | ^2.3.5 |
-| hooks_riverpod | ^2.5.1 |
-| isar | ^3.1.0+1 |
-| isar_flutter_libs | ^3.1.0+1 |
-| path_provider | ^2.1.3 |
-| freezed_annotation | ^2.4.4 |
-| json_annotation | ^4.9.0 |
-| go_router | ^14.2.0 |
-| fl_chart | ^0.68.0 |
-| google_fonts | ^6.2.1 |
-| shimmer | ^3.0.0 |
-| flutter_animate | ^4.5.0 |
-| flex_color_scheme | ^7.3.1 |
-| reactive_forms | ^17.0.1 |
-| intl | ^0.20.2 |
-| uuid | ^4.4.0 |
-| logger | ^2.3.0 |
-| collection | ^1.18.0 |
-| local_auth | ^2.3.0 |
-| flutter_secure_storage | ^9.2.2 |
-| pdf | ^3.10.11 |
-| printing | ^5.11.1 |
-| image_picker | ^1.1.2 |
-| share_plus | ^9.0.0 |
-| permission_handler | ^11.3.1 |
+## Part 3: Data Models [x]
+- [x] Transaction Model
+- [x] Loan Model
+- [x] Category Model
+- [x] Budget Model
+- [x] Transaction Summary Model
+- [x] Enums (TransactionType, LoanType, RecurringType)
 
-## Notes
-- Part 1 completed: Project configured with all necessary dependencies and linting rules.
-- Part 5 completed: Implemented Riverpod providers for all features including state notifiers, async notifiers, and code generation.
+| Model | Isar Collection | Freezed Entity |
+|-------|----------------|----------------|
+| Transaction | transactionModels | TransactionEntity |
+| Loan | loanModels | LoanEntity |
+| Category | categoryModels | CategoryEntity |
+| Budget | budgetModels | BudgetEntity |
 
-## Providers Reference
-| Provider | Type | Returns |
-|----------|------|---------|
-| `transactionListProvider` | `AsyncNotifier` | `Stream<List<Transaction>>` |
-| `transactionSummaryProvider` | `FutureProvider` | `TransactionSummary` |
-| `loanListProvider` | `AsyncNotifier` | `Stream<List<Loan>>` |
-| `loanSummaryProvider` | `FutureProvider` | `({totalOwed, totalToReceive})` |
-| `categoryListProvider` | `AsyncNotifier` | `Stream<List<Category>>` |
-| `budgetListProvider` | `AsyncNotifier` | `Stream<List<Budget>>` |
-| `categoryPieDataProvider` | `FutureProvider` | `List<PieChartSectionData>` |
-| `appSettingsProvider` | `AsyncNotifier` | `ThemeMode` |
+## Part 4: Database & Repositories [x]
+- [x] Initialize Isar with all schemas
+- [x] Create `ITransactionRepository` & `TransactionRepositoryImpl`
+- [x] Create `ILoanRepository` & `LoanRepositoryImpl`
+- [x] Create `ICategoryRepository` & `CategoryRepositoryImpl`
+- [x] Create `IBudgetRepository` & `BudgetRepositoryImpl`
+- [x] Shared models: `CategoryTotal`, `LoanSummary`
+- [x] Repository Providers
+- [x] Unit tests for Repositories
 
-## Repository Methods
-| Repository | Key Methods |
-|------------|-------------|
-| `Transaction` | `watchAll`, `getSummary`, `watchCategoryTotals`, `add`, `delete` |
-| `Loan` | `watchAll`, `addRepayment`, `markSettled`, `getOverdue` |
-| `Category` | `watchAll`, `getAll`, `add`, `update`, `delete` |
-| `Budget` | `watchAll`, `getByCategory`, `setBudget`, `updateSpentAmount` |
+### Repository Methods
+**Transaction Repository**
+- `watchAll`: Stream of filtered transactions
+- `getById`: Fetch single transaction by UUID
+- `add`: Insert new transaction
+- `update`: Update existing transaction
+- `delete`: Remove transaction by UUID
+- `getSummary`: Period totals (Income/Expense)
+- `getCategoryTotals`: Grouped expenses by category
 
-## Data Models
-| Model | Isar Collection | Key Fields |
-|-------|-----------------|------------|
-| `Transaction` | `Transactions` | `title`, `amount`, `date`, `type` |
-| `Loan` | `Loans` | `personName`, `amount`, `type`, `date` |
-| `Category` | `Categorys` | `name`, `iconCodePoint`, `colorValue` |
-| `Budget` | `Budgets` | `categoryId`, `monthYear`, `limitAmount` |
-| `Repayment` | (Embedded) | `amount`, `date` |
+**Loan Repository**
+- `watchAll`: Stream of filtered loans
+- `getById`: Fetch single loan by UUID
+- `add`: Insert new loan
+- `update`: Update existing loan
+- `delete`: Remove loan by UUID
+- `addRepayment`: Append repayment to loan
+- `markSettled`: Set loan as paid
+- `getOverdue`: Fetch unpaid past-due loans
+- `getSummary`: Loan stats (Gave/Took/Overdue)
 
-## Routing
-- Dashboard: `/` (Name: `dashboard`)
-- Analytics: `/analytics` (Name: `analytics`)
-- Loans: `/loans` (Name: `loans`)
-- Settings: `/settings` (Name: `settings`)
+**Category Repository**
+- `watchAll`: Stream of categories
+- `add`: Insert new category
+- `update`: Update existing category
+- `archive`: Archive category
+- `seedDefaults`: Insert initial 10 categories
+
+**Budget Repository**
+- `watchByMonth`: Stream of budgets for a month
+- `setLimit`: Set/Update budget limit
+- `updateSpent`: Sync spent amount
+- `getForCategory`: Fetch budget for specific category
+
+## Part 5: State Management & Logic [ ]
+...
