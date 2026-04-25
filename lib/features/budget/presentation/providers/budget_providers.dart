@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:moneywise/features/budget/domain/budget_model.dart';
 import 'package:moneywise/features/categories/domain/category_model.dart';
-import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
+import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
 
 part 'budget_providers.freezed.dart';

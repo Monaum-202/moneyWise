@@ -4,9 +4,9 @@ import 'package:moneywise/features/budget/domain/i_budget_repository.dart';
 import 'package:uuid/uuid.dart';
 
 class BudgetRepositoryImpl implements IBudgetRepository {
-  final Isar isar;
 
   BudgetRepositoryImpl(this.isar);
+  final Isar isar;
 
   @override
   Stream<List<BudgetEntity>> watchByMonth(String monthYear) {

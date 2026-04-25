@@ -1,5 +1,5 @@
-import 'package:isar/isar.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:isar/isar.dart';
 
 part 'budget_model.freezed.dart';
 part 'budget_model.g.dart';
@@ -22,6 +22,8 @@ class BudgetModel {
 
 @freezed
 class BudgetEntity with _$BudgetEntity {
+
+  factory BudgetEntity.fromJson(Map<String, dynamic> json) => _$BudgetEntityFromJson(json);
   const BudgetEntity._();
 
   const factory BudgetEntity({
@@ -33,6 +35,4 @@ class BudgetEntity with _$BudgetEntity {
   }) = _BudgetEntity;
 
   double get percentage => limitAmount > 0 ? spentAmount / limitAmount : 0.0;
-
-  factory BudgetEntity.fromJson(Map<String, dynamic> json) => _$BudgetEntityFromJson(json);
 }
