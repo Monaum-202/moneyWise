@@ -1,50 +1,66 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:isar/isar.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:isar/isar.dart';
 import 'package:moneywise/features/transactions/data/transaction_repository_impl.dart';
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
-import 'package:moneywise/shared/enums/recurring_type.dart';
+import 'package:moneywise/features/loans/domain/loan_model.dart';
+import 'package:moneywise/features/categories/domain/category_model.dart';
 import 'package:moneywise/shared/enums/transaction_type.dart';
+import 'package:moneywise/shared/enums/recurring_type.dart';
 
 class MockIsar extends Mock implements Isar {}
-class MockIsarCollection extends Mock implements IsarCollection<Transaction> {}
+class MockTransactionCollection extends Mock implements IsarCollection<TransactionModel> {}
+class MockLoanCollection extends Mock implements IsarCollection<LoanModel> {}
+class MockCategoryCollection extends Mock implements IsarCollection<CategoryModel> {}
 
 void main() {
-  late TransactionRepositoryImpl repository;
+  late TransactionRepositoryImpl transactionRepository;
   late MockIsar mockIsar;
-  late MockIsarCollection mockCollection;
+  late MockTransactionCollection mockTransactionCollection;
+  late MockLoanCollection mockLoanCollection;
+  late MockCategoryCollection mockCategoryCollection;
+
+  setUpAll(() {
+    registerFallbackValue(TransactionModel());
+    registerFallbackValue(LoanModel());
+  });
 
   setUp(() {
     mockIsar = MockIsar();
-    mockCollection = MockIsarCollection();
-    repository = TransactionRepositoryImpl(mockIsar);
+    mockTransactionCollection = MockTransactionCollection();
+    mockLoanCollection = MockLoanCollection();
+    mockCategoryCollection = MockCategoryCollection();
 
-    // Mocking Isar collection access
-    when(() => mockIsar.transactions).thenReturn(mockCollection);
+    transactionRepository = TransactionRepositoryImpl(mockIsar);
+
+    when(() => mockIsar.collection<TransactionModel>()).thenReturn(mockTransactionCollection);
+    when(() => mockIsar.collection<LoanModel>()).thenReturn(mockLoanCollection);
+    when(() => mockIsar.collection<CategoryModel>()).thenReturn(mockCategoryCollection);
   });
 
-  group('TransactionRepository Tests', () {
-    test('add transaction calls put on collection', () async {
-      final transaction = Transaction()
-        ..uuid = 'test-uuid'
-        ..title = 'Lunch'
-        ..amount = 15.0
-        ..type = TransactionType.expense
-        ..categoryId = 'cat-1'
-        ..date = DateTime.now()
-        ..isRecurring = false
-        ..recurringType = RecurringType.none
-        ..createdAt = DateTime.now();
+  group('TransactionRepository', () {
+    final testEntity = TransactionEntity(
+      uuid: 'test-uuid',
+      title: 'Lunch',
+      amount: 15.0,
+      type: TransactionType.expense,
+      categoryId: 'cat-1',
+      date: DateTime(2024, 1, 1),
+      isRecurring: false,
+      recurringType: RecurringType.none,
+      createdAt: DateTime(2024, 1, 1),
+    );
 
-      when(() => mockIsar.writeTxn(any())).thenAnswer((invocation) async {
-        final callback = invocation.positionalArguments[0] as Future<dynamic> Function();
-        return callback();
+    test('add calls put on collection inside txn', () async {
+      when(() => mockIsar.writeTxn<int>(any())).thenAnswer((invocation) async {
+        final callback = invocation.positionalArguments[0] as Future<int> Function();
+        return await callback();
       });
-      when(() => mockCollection.put(any())).thenAnswer((_) async => 1);
+      when(() => mockTransactionCollection.put(any())).thenAnswer((_) async => 1);
 
-      await repository.add(transaction);
+      await transactionRepository.add(testEntity);
 
-      verify(() => mockCollection.put(transaction)).called(1);
+      verify(() => mockTransactionCollection.put(any())).called(1);
     });
   });
 }
