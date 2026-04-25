@@ -5,9 +5,9 @@ import 'package:moneywise/features/categories/domain/i_category_repository.dart'
 import 'package:uuid/uuid.dart';
 
 class CategoryRepositoryImpl implements ICategoryRepository {
-  final Isar isar;
 
   CategoryRepositoryImpl(this.isar);
+  final Isar isar;
 
   @override
   Stream<List<CategoryEntity>> watchAll({bool includeArchived = false}) {
