@@ -1,8 +1,8 @@
-import 'package:moneywise/shared/models/budget_model.dart';
+import 'package:moneywise/features/budget/domain/budget_model.dart';
 
 abstract interface class IBudgetRepository {
-  Stream<List<Budget>> watchAll(String monthYear);
-  Future<Budget?> getByCategory(int categoryId, String monthYear);
-  Future<void> setBudget(Budget budget);
-  Future<void> updateSpentAmount(int categoryId, String monthYear, double amount);
+  Stream<List<BudgetEntity>> watchByMonth(String monthYear);
+  Future<void> setLimit(String categoryId, String monthYear, double limit);
+  Future<void> updateSpent(String categoryId, String monthYear, double spent);
+  Future<BudgetEntity?> getForCategory(String categoryId, String monthYear);
 }

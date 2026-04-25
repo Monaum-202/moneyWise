@@ -1,9 +1,9 @@
-import 'package:moneywise/shared/models/category_model.dart';
+import 'package:moneywise/features/categories/domain/category_model.dart';
 
 abstract interface class ICategoryRepository {
-  Stream<List<Category>> watchAll();
-  Future<List<Category>> getAll();
-  Future<void> add(Category category);
-  Future<void> update(Category category);
-  Future<void> delete(int id);
+  Stream<List<CategoryEntity>> watchAll({bool includeArchived = false});
+  Future<void> add(CategoryEntity category);
+  Future<void> update(CategoryEntity category);
+  Future<void> archive(String uuid);
+  Future<void> seedDefaults();
 }
