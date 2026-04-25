@@ -19,23 +19,23 @@ dependencies:
   # Database
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
-  path_provider: ^2.1.3
+  path_provider: ^2.1.5
 
   # Models
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
 
   # Navigation
-  go_router: ^14.2.0
+  go_router: ^14.8.1
 
   # Charts
   fl_chart: ^0.68.0
 
   # UI Components
-  google_fonts: ^6.2.1
+  google_fonts: ^6.3.3
   shimmer: ^3.0.0
-  flutter_animate: ^4.5.0
-  flex_color_scheme: ^7.3.1
+  flutter_animate: ^4.5.2
+  flex_color_scheme: ^8.4.0
 
   # Forms
   reactive_forms: ^17.0.1
