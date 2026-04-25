@@ -8,7 +8,7 @@ part 'transaction_summary_provider.g.dart';
 Future<TransactionSummary> transactionSummary(TransactionSummaryRef ref) async {
   final repository = ref.watch(transactionRepositoryProvider);
   final now = DateTime.now();
-  final firstDay = DateTime(now.year, now.month, 1);
+  final firstDay = DateTime(now.year, now.month);
   final lastDay = DateTime(now.year, now.month + 1, 0);
   
   return repository.getSummary(firstDay, lastDay);
