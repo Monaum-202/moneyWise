@@ -14,8 +14,8 @@ Future<({double totalOwed, double totalToReceive})> loanSummary(LoanSummaryRef r
   for (final loan in loans) {
     if (loan.isPaid) continue;
     
-    double repaid = loan.repayments.fold(0, (sum, r) => sum + r.amount);
-    double remaining = loan.amount - repaid;
+    final repaid = loan.repayments.fold(0.0, (sum, r) => sum + r.amount);
+    final remaining = loan.amount - repaid;
 
     if (loan.type == LoanType.gave) {
       totalToReceive += remaining;

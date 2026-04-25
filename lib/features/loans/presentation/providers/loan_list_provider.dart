@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneywise/features/loans/data/loan_repository_impl.dart';
 import 'package:moneywise/features/loans/domain/i_loan_repository.dart';
+import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/shared/enums/loan_type.dart';
-import 'package:moneywise/shared/models/loan_model.dart';
 import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

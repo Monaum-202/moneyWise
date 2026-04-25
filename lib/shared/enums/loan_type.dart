@@ -1,4 +1,1 @@
-enum LoanType {
-  gave,
-  took;
-}
+enum LoanType { gave, took }
