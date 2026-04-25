@@ -1,8 +1,8 @@
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
-import 'package:moneywise/features/transactions/presentation/providers/transaction_list_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_summary_provider.dart';
 import 'package:moneywise/shared/enums/recurring_type.dart';
 import 'package:moneywise/shared/enums/transaction_type.dart';
+import 'package:moneywise/shared/providers/repository_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -32,20 +32,7 @@ class TransactionForm extends _$TransactionForm {
   void updateCategory(String categoryId) => state = state.copyWith(categoryId: categoryId);
 
   Future<void> submit() async {
-    final transaction = Transaction()
-      ..uuid = state.uuid
-      ..title = state.title
-      ..amount = state.amount
-      ..type = state.type
-      ..categoryId = state.categoryId
-      ..date = state.date
-      ..note = state.note
-      ..isRecurring = state.isRecurring
-      ..recurringType = state.recurringType
-      ..receiptImagePath = state.receiptImagePath
-      ..createdAt = state.createdAt;
-      
-    await ref.read(transactionRepositoryProvider).add(transaction);
+    await ref.read(transactionRepositoryProvider).add(state);
     ref.invalidate(transactionSummaryProvider);
   }
 }

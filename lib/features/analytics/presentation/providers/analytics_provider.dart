@@ -1,42 +1,24 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:moneywise/features/categories/domain/category_model.dart';
-import 'package:moneywise/features/categories/presentation/providers/category_list_provider.dart';
-import 'package:moneywise/features/transactions/presentation/providers/transaction_list_provider.dart';
-import 'package:moneywise/shared/enums/transaction_type.dart';
+import 'package:moneywise/shared/providers/repository_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'analytics_provider.g.dart';
 
 @riverpod
-Future<List<PieChartSectionData>> categoryPieData(CategoryPieDataRef ref) async {
-  final transactions = await ref.watch(transactionListProvider().future);
-  final categories = await ref.watch(categoryListProvider.future);
+Future<List<PieChartSectionData>> categoryPieData(CategoryPieDataRef ref, String monthYear) async {
+  final repository = ref.watch(transactionRepositoryProvider);
+  final totals = await repository.getCategoryTotals(monthYear);
   
-  final totals = <String, double>{};
-  double totalExpense = 0;
-
-  for (final t in transactions) {
-    if (t.type == TransactionType.expense) {
-      totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
-      totalExpense += t.amount;
-    }
-  }
+  final totalExpense = totals.fold(0.0, (sum, item) => sum + item.total);
 
   if (totalExpense == 0) return [];
 
-  return totals.entries.map((entry) {
-    final category = categories.firstWhere(
-      (c) => c.uuid == entry.key,
-      orElse: () => Category()
-        ..name = 'Unknown'
-        ..colorValue = Colors.grey.toARGB32(),
-    );
-    
+  return totals.map((entry) {
     return PieChartSectionData(
-      value: entry.value,
-      title: '${(entry.value / totalExpense * 100).toStringAsFixed(0)}%',
-      color: Color(category.colorValue),
+      value: entry.total,
+      title: '${(entry.total / totalExpense * 100).toStringAsFixed(0)}%',
+      color: Color(entry.colorValue),
       radius: 50,
       showTitle: true,
     );

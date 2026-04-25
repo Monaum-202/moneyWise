@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:moneywise/features/categories/data/category_repository_impl.dart';
 import 'package:moneywise/features/categories/domain/category_model.dart';
-import 'package:moneywise/features/categories/domain/i_category_repository.dart';
-import 'package:moneywise/shared/providers/isar_provider.dart';
+import 'package:moneywise/shared/providers/repository_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 part 'category_list_provider.g.dart';
 
-final categoryRepositoryProvider = Provider<ICategoryRepository>((ref) {
-  final isar = ref.watch(isarProvider);
-  return CategoryRepositoryImpl(isar);
-});
-
 @riverpod
 class CategoryList extends _$CategoryList {
   @override
-  Stream<List<Category>> build() {
+  Stream<List<CategoryEntity>> build() {
     return ref.watch(categoryRepositoryProvider).watchAll();
   }
 
   Future<void> addCategory(String name, IconData icon, Color color) async {
-    final category = Category()
-      ..uuid = const Uuid().v4()
-      ..name = name
-      ..iconCodePoint = icon.codePoint
-      ..colorValue = color.toARGB32()
-      ..isCustom = true
-      ..isArchived = false
-      ..monthlyBudget = 0.0
-      ..createdAt = DateTime.now();
-
+    final category = CategoryEntity(
+      uuid: const Uuid().v4(),
+      name: name,
+      iconCodePoint: icon.codePoint,
+      colorValue: color.toARGB32(),
+      isCustom: true,
+      isArchived: false,
+      monthlyBudget: 0.0,
+      createdAt: DateTime.now(),
+    );
     await ref.read(categoryRepositoryProvider).add(category);
   }
 }
