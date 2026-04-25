@@ -11,8 +11,8 @@ import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PreloadedIsar extends IsarNotifier {
-  final Isar isar;
   PreloadedIsar(this.isar);
+  final Isar isar;
   @override
   Future<Isar> build() async => isar;
 }

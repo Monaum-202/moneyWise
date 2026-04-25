@@ -69,5 +69,32 @@
 - `updateSpent`: Sync spent amount
 - `getForCategory`: Fetch budget for specific category
 
-## Part 5: State Management & Logic [ ]
+## Part 5: State Management & Logic [x]
+- [x] Transaction Filters & Providers
+- [x] Loan Filters & Providers
+- [x] Category Providers & Seeder
+- [x] Budget Providers & Merged UI Model
+- [x] Analytics & Insights Providers
+- [x] App Settings & Secure Storage Notifier
+
+### Providers Reference
+
+| Provider | Type | Returns |
+|----------|------|---------|
+| transactionListProvider | StreamProvider | List<TransactionEntity> |
+| monthlySummaryProvider | FutureProvider | TransactionSummary |
+| categoryTotalsProvider | FutureProvider | List<CategoryTotal> |
+| transactionFormProvider | StateNotifierProvider | TransactionEntity? |
+| loanListProvider | StreamProvider | List<LoanEntity> |
+| loanFormProvider | StateNotifierProvider | LoanEntity? |
+| categoryListProvider | StreamProvider | List<CategoryEntity> |
+| categoryMapProvider | Provider | Map<String, CategoryEntity> |
+| budgetListProvider | StreamProvider | List<BudgetEntity> |
+| categoryBudgetProvider | Provider | List<CategoryBudget> |
+| pieChartDataProvider | Provider | List<Map<String, dynamic>> |
+| barChartDataProvider | FutureProvider | List<Map<String, dynamic>> |
+| insightsProvider | Provider | List<String> |
+| settingsProvider | AsyncNotifierProvider | AppSettings |
+
+## Part 6: Navigation & Layout [ ]
 ...

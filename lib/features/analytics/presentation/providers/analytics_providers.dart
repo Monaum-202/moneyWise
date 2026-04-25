@@ -15,8 +15,8 @@ final analyticsDateRangeProvider = Provider<DateTimeRange>((ref) {
   final now = DateTime.now();
   return switch (period) {
     AnalyticsPeriod.week => DateTimeRange(start: now.subtract(const Duration(days: 7)), end: now),
-    AnalyticsPeriod.month => DateTimeRange(start: DateTime(now.year, now.month, 1), end: now),
-    AnalyticsPeriod.year => DateTimeRange(start: DateTime(now.year, 1, 1), end: now),
+    AnalyticsPeriod.month => DateTimeRange(start: DateTime(now.year, now.month), end: now),
+    AnalyticsPeriod.year => DateTimeRange(start: DateTime(now.year), end: now),
     AnalyticsPeriod.custom => DateTimeRange(start: now, end: now),
   };
 });
@@ -39,7 +39,7 @@ final barChartDataProvider = FutureProvider<List<Map<String, dynamic>>>((ref) as
   final repo = ref.watch(transactionRepositoryProvider);
   // Query transactions, group by day, return list of {date, income, expense}
   final transactions = await repo.watchAll(from: range.start, to: range.end).first;
-  final Map<String, Map<String, double>> grouped = {};
+  final grouped = <String, Map<String, double>>{};
   for (final t in transactions) {
     final key = '${t.date.year}-${t.date.month}-${t.date.day}';
     grouped[key] ??= {'income': 0, 'expense': 0};
@@ -61,13 +61,16 @@ final insightsProvider = Provider<List<String>>((ref) {
   final totals = ref.watch(categoryTotalsProvider).valueOrNull ?? [];
   if (summary == null) return [];
   final insights = <String>[];
-  final savingsRate = summary.totalIncome > 0 ? ((summary.totalIncome - summary.totalExpense) / summary.totalIncome) * 100 : 0;
 
-  if (savingsRate > 20) insights.add('Great job! You saved \${savingsRate.toStringAsFixed(0)}% this month.');
-  if (savingsRate < 0) insights.add('You spent more than you earned this month. Review your expenses.');
+  if (summary.savingsRate > 20) {
+    insights.add('Great job! You saved ${summary.savingsRate.toStringAsFixed(0)}% this month.');
+  }
+  if (summary.savingsRate < 0) {
+    insights.add('You spent more than you earned this month. Review your expenses.');
+  }
   if (totals.isNotEmpty) {
     final top = totals.reduce((a, b) => a.total > b.total ? a : b);
-    insights.add('Biggest spend: \${top.categoryName} — ৳\${top.total.toStringAsFixed(0)}');
+    insights.add('Biggest spend: ${top.categoryName} — ৳${top.total.toStringAsFixed(0)}');
   }
   return insights;
 });
