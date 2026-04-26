@@ -14,6 +14,6 @@ abstract interface class ITransactionRepository {
   Future<void> add(TransactionEntity transaction);
   Future<void> update(TransactionEntity transaction);
   Future<void> delete(String uuid);
-  Future<TransactionSummary> getSummary(DateTime from, DateTime to);
-  Future<List<CategoryTotal>> getCategoryTotals(String monthYear);
+  Stream<TransactionSummary> watchSummary(DateTime from, DateTime to);
+  Stream<List<CategoryTotal>> watchCategoryTotals(String monthYear);
 }

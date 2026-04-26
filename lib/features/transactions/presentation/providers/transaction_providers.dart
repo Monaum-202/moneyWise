@@ -27,20 +27,20 @@ final transactionListProvider = StreamProvider<List<TransactionEntity>>((ref) {
 });
 
 // Monthly summary for dashboard
-final monthlySummaryProvider = FutureProvider<TransactionSummary>((ref) {
+final monthlySummaryProvider = StreamProvider<TransactionSummary>((ref) {
   final repo = ref.watch(transactionRepositoryProvider);
   final now = DateTime.now();
   final from = DateTime(now.year, now.month);
   final to = DateTime(now.year, now.month + 1, 0);
-  return repo.getSummary(from, to);
+  return repo.watchSummary(from, to);
 });
 
 // Category totals for charts
-final categoryTotalsProvider = FutureProvider<List<CategoryTotal>>((ref) {
+final categoryTotalsProvider = StreamProvider<List<CategoryTotal>>((ref) {
   final repo = ref.watch(transactionRepositoryProvider);
   final now = DateTime.now();
   final monthYear = '${now.year}-${now.month.toString().padLeft(2, '0')}';
-  return repo.getCategoryTotals(monthYear);
+  return repo.watchCategoryTotals(monthYear);
 });
 
 // Transaction form notifier
@@ -95,6 +95,6 @@ class TransactionFormNotifier extends StateNotifier<TransactionEntity?> {
   }
 }
 
-final transactionFormProvider = StateNotifierProvider<TransactionFormNotifier, TransactionEntity?>(
+final transactionFormProvider = StateNotifierProvider.autoDispose<TransactionFormNotifier, TransactionEntity?>(
   (ref) => TransactionFormNotifier(ref.watch(transactionRepositoryProvider)),
 );

@@ -7,7 +7,6 @@ import 'package:moneywise/shared/models/category_total.dart';
 import 'package:moneywise/shared/models/transaction_summary.dart';
 
 class TransactionRepositoryImpl implements ITransactionRepository {
-
   TransactionRepositoryImpl(this.isar);
   final Isar isar;
 
@@ -68,56 +67,59 @@ class TransactionRepositoryImpl implements ITransactionRepository {
   }
 
   @override
-  Future<TransactionSummary> getSummary(DateTime from, DateTime to) async {
-    final transactions = await isar.transactionModels
+  Stream<TransactionSummary> watchSummary(DateTime from, DateTime to) {
+    return isar.transactionModels
         .where()
         .filter()
         .dateBetween(from, to)
-        .findAll();
+        .watch(fireImmediately: true)
+        .map((transactions) {
+      double income = 0;
+      double expense = 0;
 
-    double income = 0;
-    double expense = 0;
-
-    for (final t in transactions) {
-      if (t.type == TransactionType.income) {
-        income += t.amount;
-      } else {
-        expense += t.amount;
+      for (final t in transactions) {
+        if (t.type == TransactionType.income) {
+          income += t.amount;
+        } else {
+          expense += t.amount;
+        }
       }
-    }
 
-    return TransactionSummary(
-      totalIncome: income,
-      totalExpense: expense,
-    );
+      return TransactionSummary(
+        totalIncome: income,
+        totalExpense: expense,
+      );
+    });
   }
 
   @override
-  Future<List<CategoryTotal>> getCategoryTotals(String monthYear) async {
-    // In a real app, monthYear would be used to filter dates. 
-    // For simplicity, we assume monthYear filter logic here.
-    final transactions = await isar.transactionModels.where().findAll();
-    final categories = await isar.categoryModels.where().findAll();
+  Stream<List<CategoryTotal>> watchCategoryTotals(String monthYear) {
+    // For simplicity, we watch all transactions and categories.
+    // In a real app, you might want to be more specific with the query.
+    return isar.transactionModels.where().watch(fireImmediately: true).asyncMap((_) async {
+      final transactions = await isar.transactionModels.where().findAll();
+      final categories = await isar.categoryModels.where().findAll();
 
-    final categoryMap = {for (var c in categories) c.uuid: c};
-    final totals = <String, double>{};
+      final categoryMap = {for (var c in categories) c.uuid: c};
+      final totals = <String, double>{};
 
-    for (final t in transactions) {
-      if (t.type == TransactionType.expense) {
-        totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
+      for (final t in transactions) {
+        if (t.type == TransactionType.expense) {
+          totals[t.categoryId] = (totals[t.categoryId] ?? 0) + t.amount;
+        }
       }
-    }
 
-    return totals.entries.map((e) {
-      final cat = categoryMap[e.key];
-      return CategoryTotal(
-        categoryId: e.key,
-        categoryName: cat?.name ?? 'Unknown',
-        total: e.value,
-        colorValue: cat?.colorValue ?? 0xFF808080,
-        iconCodePoint: cat?.iconCodePoint ?? 0xe13d,
-      );
-    }).toList();
+      return totals.entries.map((e) {
+        final cat = categoryMap[e.key];
+        return CategoryTotal(
+          categoryId: e.key,
+          categoryName: cat?.name ?? 'Unknown',
+          total: e.value,
+          colorValue: cat?.colorValue ?? 0xFF808080,
+          iconCodePoint: cat?.iconCodePoint ?? 0xe13d,
+        );
+      }).toList();
+    });
   }
 
   TransactionEntity _toEntity(TransactionModel model) {
