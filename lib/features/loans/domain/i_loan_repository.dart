@@ -11,5 +11,5 @@ abstract interface class ILoanRepository {
   Future<void> addRepayment(String loanUuid, RepaymentEntity repayment);
   Future<void> markSettled(String loanUuid);
   Future<List<LoanEntity>> getOverdue();
-  Future<LoanSummary> getSummary();
+  Stream<LoanSummary> watchSummary();
 }

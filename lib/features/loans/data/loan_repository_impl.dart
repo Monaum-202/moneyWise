@@ -5,9 +5,9 @@ import 'package:moneywise/shared/enums/loan_type.dart';
 import 'package:moneywise/shared/models/loan_summary.dart';
 
 class LoanRepositoryImpl implements ILoanRepository {
+  final Isar isar;
 
   LoanRepositoryImpl(this.isar);
-  final Isar isar;
 
   @override
   Stream<List<LoanEntity>> watchAll({LoanType? type, bool? isPaid}) {
@@ -99,37 +99,37 @@ class LoanRepositoryImpl implements ILoanRepository {
   }
 
   @override
-  Future<LoanSummary> getSummary() async {
-    final loans = await isar.loanModels.where().findAll();
-    final now = DateTime.now();
+  Stream<LoanSummary> watchSummary() {
+    return isar.loanModels.where().watch(fireImmediately: true).map((loans) {
+      final now = DateTime.now();
+      double totalGave = 0;
+      double totalTook = 0;
+      double totalOverdue = 0;
+      int overdueCount = 0;
 
-    double totalGave = 0;
-    double totalTook = 0;
-    double totalOverdue = 0;
-    var overdueCount = 0;
+      for (final loan in loans) {
+        final repaid = loan.repayments.fold(0.0, (sum, r) => sum + r.amount);
+        final remaining = loan.amount - repaid;
 
-    for (final loan in loans) {
-      final repaid = loan.repayments.fold(0.0, (sum, r) => sum + r.amount);
-      final remaining = loan.amount - repaid;
+        if (loan.type == LoanType.gave) {
+          totalGave += remaining;
+        } else {
+          totalTook += remaining;
+        }
 
-      if (loan.type == LoanType.gave) {
-        totalGave += remaining;
-      } else {
-        totalTook += remaining;
+        if (!loan.isPaid && loan.dueDate != null && loan.dueDate!.isBefore(now)) {
+          totalOverdue += remaining;
+          overdueCount++;
+        }
       }
 
-      if (!loan.isPaid && loan.dueDate != null && loan.dueDate!.isBefore(now)) {
-        totalOverdue += remaining;
-        overdueCount++;
-      }
-    }
-
-    return LoanSummary(
-      totalGave: totalGave,
-      totalTook: totalTook,
-      totalOverdue: totalOverdue,
-      overdueCount: overdueCount,
-    );
+      return LoanSummary(
+        totalGave: totalGave,
+        totalTook: totalTook,
+        totalOverdue: totalOverdue,
+        overdueCount: overdueCount,
+      );
+    });
   }
 
   LoanEntity _toEntity(LoanModel model) {

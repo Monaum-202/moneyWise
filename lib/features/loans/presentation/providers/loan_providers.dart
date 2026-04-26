@@ -24,8 +24,8 @@ final loanListProvider = StreamProvider<List<LoanEntity>>((ref) {
   };
 });
 
-final loanSummaryProvider = FutureProvider<LoanSummary>((ref) {
-  return ref.watch(loanRepositoryProvider).getSummary();
+final loanSummaryProvider = StreamProvider<LoanSummary>((ref) {
+  return ref.watch(loanRepositoryProvider).watchSummary();
 });
 
 // Loan form notifier
@@ -47,6 +47,7 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
   void updateName(String v) => state = state?.copyWith(personName: v);
   void updateAmount(double v) => state = state?.copyWith(amount: v);
   void updateType(LoanType v) => state = state?.copyWith(type: v);
+  void updateDate(DateTime d) => state = state?.copyWith(date: d);
   void updateDueDate(DateTime? d) => state = state?.copyWith(dueDate: d);
   void updatePurpose(String v) => state = state?.copyWith(purpose: v);
 
@@ -86,6 +87,6 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
   }
 }
 
-final loanFormProvider = StateNotifierProvider<LoanFormNotifier, LoanEntity?>(
+final loanFormProvider = StateNotifierProvider.autoDispose<LoanFormNotifier, LoanEntity?>(
   (ref) => LoanFormNotifier(ref.watch(loanRepositoryProvider)),
 );
