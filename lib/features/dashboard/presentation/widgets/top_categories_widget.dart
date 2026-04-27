@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moneywise/shared/models/category_total.dart';
 import 'package:moneywise/core/utils/icon_helper.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
+import 'package:moneywise/shared/models/category_total.dart';
 
 class TopCategoriesWidget extends ConsumerWidget {
   const TopCategoriesWidget({super.key});
