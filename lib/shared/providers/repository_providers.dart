@@ -1,13 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/services/budget_alert_service.dart';
+import 'package:moneywise/core/services/notification_service.dart';
 import 'package:moneywise/features/budget/data/budget_repository_impl.dart';
 import 'package:moneywise/features/budget/domain/i_budget_repository.dart';
 import 'package:moneywise/features/categories/data/category_repository_impl.dart';
 import 'package:moneywise/features/categories/domain/i_category_repository.dart';
 import 'package:moneywise/features/loans/data/loan_repository_impl.dart';
 import 'package:moneywise/features/loans/domain/i_loan_repository.dart';
+import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/data/transaction_repository_impl.dart';
 import 'package:moneywise/features/transactions/domain/i_transaction_repository.dart';
 import 'package:moneywise/shared/providers/isar_provider.dart';
+
+final notificationServiceProvider = Provider((_) => NotificationService());
+
+final budgetAlertServiceProvider = Provider((ref) {
+  return BudgetAlertService(
+    ref.watch(notificationServiceProvider),
+    ref.watch(secureStorageProvider),
+  );
+});
 
 final transactionRepositoryProvider = Provider<ITransactionRepository>((ref) {
   final isar = ref.watch(isarProvider).requireValue;
