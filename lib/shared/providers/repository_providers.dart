@@ -16,27 +16,26 @@ final notificationServiceProvider = Provider((_) => NotificationService());
 
 final budgetAlertServiceProvider = Provider((ref) {
   return BudgetAlertService(
-    ref.watch(notificationServiceProvider),
     ref.watch(secureStorageProvider),
   );
 });
 
 final transactionRepositoryProvider = Provider<ITransactionRepository>((ref) {
-  final isar = ref.watch(isarProvider).requireValue;
+  final isar = ref.watch(isarProvider);
   return TransactionRepositoryImpl(isar);
 });
 
 final loanRepositoryProvider = Provider<ILoanRepository>((ref) {
-  final isar = ref.watch(isarProvider).requireValue;
+  final isar = ref.watch(isarProvider);
   return LoanRepositoryImpl(isar);
 });
 
 final categoryRepositoryProvider = Provider<ICategoryRepository>((ref) {
-  final isar = ref.watch(isarProvider).requireValue;
+  final isar = ref.watch(isarProvider);
   return CategoryRepositoryImpl(isar);
 });
 
 final budgetRepositoryProvider = Provider<IBudgetRepository>((ref) {
-  final isar = ref.watch(isarProvider).requireValue;
+  final isar = ref.watch(isarProvider);
   return BudgetRepositoryImpl(isar);
 });

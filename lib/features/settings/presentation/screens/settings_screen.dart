@@ -1,21 +1,17 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:moneywise/core/utils/pdf_report_generator.dart';
 import 'package:moneywise/core/utils/currency_formatter.dart';
+import 'package:moneywise/core/utils/export_service.dart';
+import 'package:moneywise/core/utils/pdf_report_generator.dart';
 import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -23,6 +19,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider).valueOrNull ?? const AppSettings();
+    final isar = ref.watch(isarProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,6 +50,18 @@ class SettingsScreen extends ConsumerWidget {
           _Section(
             title: 'PREFERENCES',
             children: [
+              ListTile(
+                title: const Text('Categories'),
+                leading: const Icon(Icons.category_rounded),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/categories'),
+              ),
+              ListTile(
+                title: const Text('Monthly Budget'),
+                leading: const Icon(Icons.account_balance_wallet_rounded),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/budget'),
+              ),
               ListTile(
                 title: const Text('Currency'),
                 trailing: DropdownButton<String>(
@@ -121,17 +130,17 @@ class SettingsScreen extends ConsumerWidget {
               ListTile(
                 title: const Text('Export JSON'),
                 leading: const Icon(Icons.download_rounded),
-                onTap: () async => await _exportData(ref),
+                onTap: () => ExportService.exportJson(isar),
               ),
               ListTile(
                 title: const Text('Import JSON'),
                 leading: const Icon(Icons.upload_rounded),
-                onTap: () async => await _importData(ref, context),
+                onTap: () => ExportService.importJson(isar, context),
               ),
               ListTile(
                 title: const Text('Export PDF Report'),
                 leading: const Icon(Icons.picture_as_pdf_rounded),
-                onTap: () async => await _exportPdf(ref, context),
+                onTap: () => _exportPdf(ref),
               ),
               ListTile(
                 title: const Text('Clear All Data', style: TextStyle(color: Colors.red)),
@@ -190,16 +199,15 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _exportPdf(WidgetRef ref, BuildContext context) async {
+  Future<void> _exportPdf(WidgetRef ref) async {
     final transRepo = ref.read(transactionRepositoryProvider);
     final loanRepo = ref.read(loanRepositoryProvider);
     final monthYear = ref.read(currentMonthYearProvider);
     final settings = ref.read(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     
-    // Fetch data for the current month
     final now = DateTime.now();
-    final startOfMonth = DateTime(now.year, now.month);
+    final startOfMonth = DateTime(now.year, now.month, 1);
     final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
     final transactions = await transRepo.watchAll(from: startOfMonth, to: endOfMonth).first;
@@ -218,46 +226,8 @@ class SettingsScreen extends ConsumerWidget {
       loanSummary: loanSummary,
       unsettledLoans: loans,
       monthYear: monthYear,
-      currency: currency,
+      currency: currencySymbol,
     );
-  }
-
-  Future<void> _exportData(WidgetRef ref) async {
-    final repo = ref.read(transactionRepositoryProvider);
-    final loanRepo = ref.read(loanRepositoryProvider);
-    
-    final transactions = await repo.watchAll().first;
-    final loans = await loanRepo.watchAll().first;
-
-    final data = {
-      'transactions': transactions.map((t) => t.toJson()).toList(),
-      'loans': loans.map((l) => l.toJson()).toList(),
-    };
-
-    final tempDir = await getTemporaryDirectory();
-    final file = File('${tempDir.path}/moneywise_backup.json');
-    await file.writeAsString(jsonEncode(data));
-
-    await Share.shareXFiles([XFile(file.path)], text: 'Moneywise Backup');
-  }
-
-  Future<void> _importData(WidgetRef ref, BuildContext context) async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['json']);
-    if (result == null) return;
-
-    try {
-      final file = File(result.files.single.path!);
-      final content = await file.readAsString();
-      jsonDecode(content);
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Import successful ✓ (Logic pending)')));
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Import failed!')));
-      }
-    }
   }
 
   void _showClearDataDialog(BuildContext context, WidgetRef ref) {
@@ -278,7 +248,7 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               if (controller.text == 'DELETE') {
-                final isar = ref.read(isarProvider).requireValue;
+                final isar = ref.read(isarProvider);
                 await isar.writeTxn(() => isar.clear());
                 if (context.mounted) Navigator.pop(context);
               }

@@ -1,18 +1,18 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:moneywise/features/loans/domain/loan_model.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  static final _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  Future<void> init() async {
+  static Future<void> init() async {
     tz.initializeTimeZones();
     
-    const initializationSettingsAndroid =
+    const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     
-    const initializationSettings = InitializationSettings(
+    const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: DarwinInitializationSettings(),
     );
@@ -26,7 +26,7 @@ class NotificationService {
         ?.requestNotificationsPermission();
   }
 
-  Future<void> scheduleLoanDueReminder(LoanEntity loan) async {
+  static Future<void> scheduleLoanDueReminder(LoanEntity loan) async {
     if (loan.dueDate == null) return;
     
     final scheduledDate = tz.TZDateTime.from(
@@ -54,12 +54,12 @@ class NotificationService {
     );
   }
 
-  Future<void> showBudgetAlert({
+  static Future<void> showBudgetAlert({
     required String categoryName,
     required double percentage,
   }) async {
-    var title = '';
-    var body = '';
+    String title = '';
+    String body = '';
     
     if (percentage >= 1.0) {
       title = '🚨 Budget exceeded';
@@ -87,11 +87,11 @@ class NotificationService {
     );
   }
 
-  Future<void> cancelLoanReminder(String loanUuid) async {
+  static Future<void> cancelLoanReminder(String loanUuid) async {
     await _notificationsPlugin.cancel(id: loanUuid.hashCode);
   }
 
-  Future<void> cancelAll() async {
+  static Future<void> cancelAll() async {
     await _notificationsPlugin.cancelAll();
   }
 }

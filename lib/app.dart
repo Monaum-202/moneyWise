@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneywise/core/constants/app_strings.dart';
+import 'package:moneywise/core/services/notification_service.dart';
 import 'package:moneywise/core/theme/app_theme.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
+import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/routing/app_router.dart';
 
@@ -48,15 +50,28 @@ class _MoneywiseAppState extends ConsumerState<MoneywiseApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
+    final settingsAsync = ref.watch(settingsProvider);
     
-    // Trigger category seeding on app startup
+    // Seed default categories
     ref.watch(categorySeederProvider);
+
+    // Schedule/Sync loan reminders on startup
+    ref.listen(loanListProvider, (previous, next) {
+      next.whenData((loans) {
+        for (final loan in loans) {
+          if (!loan.isPaid && loan.dueDate != null) {
+            NotificationService.scheduleLoanDueReminder(loan);
+          }
+        }
+      });
+    }, fireImmediately: true);
 
     return MaterialApp.router(
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      themeMode: settingsAsync.valueOrNull?.themeMode ?? ThemeMode.system,
       routerConfig: router,
     );
   }

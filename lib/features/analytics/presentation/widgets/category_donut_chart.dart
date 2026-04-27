@@ -2,9 +2,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/analytics/presentation/providers/analytics_providers.dart';
+import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 
 class CategoryDonutChart extends ConsumerWidget {

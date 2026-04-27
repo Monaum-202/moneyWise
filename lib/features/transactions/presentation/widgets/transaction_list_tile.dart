@@ -7,6 +7,7 @@ import 'package:moneywise/features/categories/presentation/providers/category_pr
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
+import 'package:moneywise/features/transactions/presentation/screens/add_transaction_sheet.dart';
 import 'package:moneywise/shared/enums/transaction_type.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
 
@@ -24,7 +25,6 @@ class TransactionListTile extends ConsumerWidget {
     final categoryMap = ref.watch(categoryMapProvider);
     final settings = ref.watch(settingsProvider).valueOrNull;
     final category = categoryMap[transaction.categoryId];
-    final currency = settings?.currency ?? '৳';
     final theme = Theme.of(context);
     final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
 

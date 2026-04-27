@@ -27,15 +27,15 @@ final analyticsDateRangeProvider = Provider<DateTimeRange>((ref) {
         end: now,
       ),
     AnalyticsPeriod.month => DateTimeRange(
-        start: DateTime(now.year, now.month, 1),
+        start: DateTime(now.year, now.month),
         end: now,
       ),
     AnalyticsPeriod.year => DateTimeRange(
-        start: DateTime(now.year, 1, 1),
+        start: DateTime(now.year),
         end: now,
       ),
     _ => DateTimeRange(
-        start: DateTime(now.year, now.month, 1),
+        start: DateTime(now.year, now.month),
         end: now,
       ),
   };

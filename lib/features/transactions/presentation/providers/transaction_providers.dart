@@ -84,7 +84,7 @@ class TransactionFormNotifier extends StateNotifier<TransactionEntity?> {
       }
       
       if (state!.type == TransactionType.expense) {
-        _checkBudgetAlerts();
+        await _checkBudgetAlerts();
       }
       
       return true;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
+import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/features/transactions/presentation/widgets/amount_input_widget.dart';
 import 'package:moneywise/features/transactions/presentation/widgets/category_picker_widget.dart';

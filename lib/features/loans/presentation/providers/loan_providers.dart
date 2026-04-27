@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/services/notification_service.dart';
 import 'package:moneywise/features/loans/domain/i_loan_repository.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/shared/enums/loan_type.dart';
@@ -63,7 +64,7 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
       }
       
       if (!state!.isPaid && state!.dueDate != null) {
-        await ref.read(notificationServiceProvider).scheduleLoanDueReminder(state!);
+        await NotificationService.scheduleLoanDueReminder(state!);
       }
       
       return true;
@@ -86,7 +87,7 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
     if (state == null) return false;
     try {
       await _repo.markSettled(state!.uuid);
-      await ref.read(notificationServiceProvider).cancelLoanReminder(state!.uuid);
+      await NotificationService.cancelLoanReminder(state!.uuid);
       return true;
     } catch (_) {
       return false;

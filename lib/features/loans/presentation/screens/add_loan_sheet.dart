@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
+import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/transactions/presentation/widgets/amount_input_widget.dart';
 import 'package:moneywise/shared/enums/loan_type.dart';

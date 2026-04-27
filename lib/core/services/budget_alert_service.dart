@@ -4,10 +4,9 @@ import 'package:moneywise/core/services/notification_service.dart';
 import 'package:moneywise/features/categories/domain/category_model.dart';
 
 class BudgetAlertService {
-  final NotificationService _notificationService;
   final FlutterSecureStorage _storage;
 
-  BudgetAlertService(this._notificationService, this._storage);
+  BudgetAlertService(this._storage);
 
   static const _keyPrefix = 'budget_alerts_';
 
@@ -34,14 +33,14 @@ class BudgetAlertService {
     bool triggered = false;
 
     if (percentage >= 1.0 && !alertedCategories.contains(alert100Key)) {
-      await _notificationService.showBudgetAlert(
+      await NotificationService.showBudgetAlert(
         categoryName: category.name,
         percentage: percentage,
       );
       alertedCategories.add(alert100Key);
       triggered = true;
     } else if (percentage >= 0.8 && percentage < 1.0 && !alertedCategories.contains(alert80Key)) {
-      await _notificationService.showBudgetAlert(
+      await NotificationService.showBudgetAlert(
         categoryName: category.name,
         percentage: percentage,
       );

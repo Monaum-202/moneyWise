@@ -51,17 +51,20 @@
 - [x] Budget Screen (Month Navigator & Monthly Limits)
 - [x] Settings Screen (Preferences & Security)
 - [x] Data Export/Import (JSON & PDF)
-- [x] Final Linter & Build cleanup
+- [x] Final Theme Polish (Light/Dark mode consistency)
+- [x] Routing Polish & Screen Wiring
 
-### Feature Status
+### Screens Reference
 
-| Feature | Screens | Status |
-|---------|---------|--------|
-| Dashboard | DashboardScreen | ✓ |
-| Transactions | TransactionsScreen, AddTransactionSheet | ✓ |
-| Loans | LoansScreen, LoanDetailScreen, AddLoanSheet, AddRepaymentSheet | ✓ |
-| Categories | CategoriesScreen, AddCategorySheet | ✓ |
-| Analytics | AnalyticsScreen | ✓ |
-| Budget | BudgetScreen | ✓ |
-| Settings | SettingsScreen, PinSetupScreen | ✓ |
-| Security | LockScreen + auto-lock | ✓ |
+| Screen | Route | Status |
+|--------|-------|--------|
+| Dashboard | / | ✓ |
+| Transactions | /transactions | ✓ |
+| Loans | /loans | ✓ |
+| Loan Detail | /loans/:uuid | ✓ |
+| Categories | /categories | ✓ |
+| Analytics | /analytics | ✓ |
+| Budget | /budget | ✓ |
+| Settings | /settings | ✓ |
+| Lock | /lock | ✓ |
+| PIN Setup | /pin-setup | ✓ |
