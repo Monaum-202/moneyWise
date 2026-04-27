@@ -9,7 +9,8 @@ import 'package:moneywise/shared/enums/transaction_type.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
-  const AddTransactionSheet({super.key});
+  const AddTransactionSheet({super.key, this.initialTransaction});
+  final TransactionEntity? initialTransaction;
 
   @override
   ConsumerState<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -25,7 +26,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(transactionFormProvider.notifier).initNew();
+      if (widget.initialTransaction != null) {
+        ref.read(transactionFormProvider.notifier).initEdit(widget.initialTransaction!);
+        _form.control('title').value = widget.initialTransaction!.title;
+        _form.control('note').value = widget.initialTransaction!.note;
+      } else {
+        ref.read(transactionFormProvider.notifier).initNew();
+      }
     });
   }
 
@@ -168,7 +175,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     if (success && mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Transaction added ✓')),
+                        SnackBar(content: Text(widget.initialTransaction != null ? 'Transaction updated ✓' : 'Transaction added ✓')),
                       );
                     }
                   } else {

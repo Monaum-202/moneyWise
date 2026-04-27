@@ -62,7 +62,14 @@ class TransactionListTile extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: theme.colorScheme.surfaceContainerLow,
         child: ListTile(
-          onTap: onTap,
+          onTap: onTap ?? () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              useSafeArea: true,
+              builder: (context) => AddTransactionSheet(initialTransaction: transaction),
+            );
+          },
           leading: CircleAvatar(
             backgroundColor: Color(category?.colorValue ?? 0xFFE0E0E0).withValues(alpha: 0.2),
             child: Icon(

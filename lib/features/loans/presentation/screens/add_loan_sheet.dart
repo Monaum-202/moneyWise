@@ -7,8 +7,8 @@ import 'package:moneywise/shared/enums/loan_type.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class AddLoanSheet extends ConsumerStatefulWidget {
-  const AddLoanSheet({super.key, this.isEdit = false});
-  final bool isEdit;
+  const AddLoanSheet({super.key, this.initialLoan});
+  final LoanEntity? initialLoan;
 
   @override
   ConsumerState<AddLoanSheet> createState() => _AddLoanSheetState();
@@ -23,17 +23,15 @@ class _AddLoanSheetState extends ConsumerState<AddLoanSheet> {
   @override
   void initState() {
     super.initState();
-    if (!widget.isEdit) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.initialLoan != null) {
+        ref.read(loanFormProvider.notifier).initEdit(widget.initialLoan!);
+        _form.control('personName').value = widget.initialLoan!.personName;
+        _form.control('purpose').value = widget.initialLoan!.purpose;
+      } else {
         ref.read(loanFormProvider.notifier).initNew();
-      });
-    } else {
-      final current = ref.read(loanFormProvider);
-      if (current != null) {
-        _form.control('personName').value = current.personName;
-        _form.control('purpose').value = current.purpose;
       }
-    }
+    });
   }
 
   @override
@@ -169,7 +167,7 @@ class _AddLoanSheetState extends ConsumerState<AddLoanSheet> {
                     if (success && mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(widget.isEdit ? 'Loan updated ✓' : 'Loan recorded ✓')),
+                        SnackBar(content: Text(widget.initialLoan != null ? 'Loan updated ✓' : 'Loan recorded ✓')),
                       );
                     }
                   } else {

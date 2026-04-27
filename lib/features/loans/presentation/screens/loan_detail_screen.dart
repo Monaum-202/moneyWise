@@ -82,11 +82,10 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         onPressed: () {
-                          ref.read(loanFormProvider.notifier).initEdit(loan);
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
-                            builder: (context) => const AddLoanSheet(isEdit: true),
+                            builder: (context) => AddLoanSheet(initialLoan: loan),
                           );
                         },
                       ),
