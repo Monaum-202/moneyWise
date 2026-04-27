@@ -8,7 +8,7 @@ import 'package:moneywise/shared/providers/repository_providers.dart';
 
 part 'budget_providers.freezed.dart';
 
-final currentMonthYearProvider = Provider<String>((ref) {
+final currentMonthYearProvider = StateProvider<String>((ref) {
   final now = DateTime.now();
   return '${now.year}-${now.month.toString().padLeft(2, '0')}';
 });
