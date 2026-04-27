@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
@@ -33,7 +34,7 @@ class _AddRepaymentSheetState extends ConsumerState<AddRepaymentSheet> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
     final remaining = widget.totalLoan - widget.alreadyRepaid - _amount;
 
@@ -61,11 +62,25 @@ class _AddRepaymentSheetState extends ConsumerState<AddRepaymentSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Remaining Balance', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
-                Text(
-                  '$currency${remaining.toStringAsFixed(0)}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: remaining < 0 ? const Color(0xFF1D9E75) : theme.colorScheme.primary,
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$currencySymbol ',
+                        style: TextStyle(
+                          color: remaining < 0 ? const Color(0xFF1D9E75) : theme.colorScheme.primary,
+                          fontSize: 12,
+                        ),
+                      ),
+                      TextSpan(
+                        text: remaining.toStringAsFixed(0),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: remaining < 0 ? const Color(0xFF1D9E75) : theme.colorScheme.primary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
