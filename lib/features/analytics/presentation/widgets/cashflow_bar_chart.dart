@@ -22,7 +22,6 @@ class CashflowBarChart extends ConsumerWidget {
           );
         }
 
-        // Show every 3rd label if more than 10 points
         final showLabels = data.length <= 10;
 
         return SizedBox(
@@ -35,8 +34,8 @@ class CashflowBarChart extends ConsumerWidget {
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipColor: (_) => theme.colorScheme.surfaceContainerHigh,
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                    final income = data[groupIndex]['income'] as double;
-                    final expense = data[groupIndex]['expense'] as double;
+                    final income = data[groupIndex].income;
+                    final expense = data[groupIndex].expense;
                     return BarTooltipItem(
                       'Income: ৳${income.toStringAsFixed(0)}\nExpense: ৳${expense.toStringAsFixed(0)}',
                       TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold),
@@ -53,7 +52,7 @@ class CashflowBarChart extends ConsumerWidget {
                       if (index < 0 || index >= data.length) return const SizedBox();
                       if (!showLabels && index % 3 != 0) return const SizedBox();
                       
-                      final dateStr = data[index]['date'] as String;
+                      final dateStr = data[index].date;
                       final parts = dateStr.split('-');
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
@@ -70,8 +69,8 @@ class CashflowBarChart extends ConsumerWidget {
               borderData: FlBorderData(show: false),
               barGroups: data.asMap().entries.map((e) {
                 final index = e.key;
-                final income = e.value['income'] as double;
-                final expense = e.value['expense'] as double;
+                final income = e.value.income;
+                final expense = e.value.expense;
 
                 return BarChartGroupData(
                   x: index,
@@ -100,11 +99,11 @@ class CashflowBarChart extends ConsumerWidget {
     );
   }
 
-  double _getMaxY(List<Map<String, dynamic>> data) {
+  double _getMaxY(List<AnalyticsBarItem> data) {
     double max = 0;
     for (final e in data) {
-      if ((e['income'] as double) > max) max = e['income'] as double;
-      if ((e['expense'] as double) > max) max = e['expense'] as double;
+      if (e.income > max) max = e.income;
+      if (e.expense > max) max = e.expense;
     }
     return max == 0 ? 100 : max;
   }
