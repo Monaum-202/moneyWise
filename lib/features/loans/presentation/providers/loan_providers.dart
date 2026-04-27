@@ -30,8 +30,9 @@ final loanSummaryProvider = StreamProvider<LoanSummary>((ref) {
 
 // Loan form notifier
 class LoanFormNotifier extends StateNotifier<LoanEntity?> {
-  LoanFormNotifier(this._repo) : super(null);
+  LoanFormNotifier(this._repo, this.ref) : super(null);
   final ILoanRepository _repo;
+  final Ref ref;
 
   void initNew() => state = LoanEntity(
         uuid: const Uuid().v4(),
@@ -60,6 +61,11 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
       } else {
         await _repo.add(state!);
       }
+      
+      if (!state!.isPaid && state!.dueDate != null) {
+        await ref.read(notificationServiceProvider).scheduleLoanDueReminder(state!);
+      }
+      
       return true;
     } catch (_) {
       return false;
@@ -80,6 +86,7 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
     if (state == null) return false;
     try {
       await _repo.markSettled(state!.uuid);
+      await ref.read(notificationServiceProvider).cancelLoanReminder(state!.uuid);
       return true;
     } catch (_) {
       return false;
@@ -88,5 +95,5 @@ class LoanFormNotifier extends StateNotifier<LoanEntity?> {
 }
 
 final loanFormProvider = StateNotifierProvider.autoDispose<LoanFormNotifier, LoanEntity?>(
-  (ref) => LoanFormNotifier(ref.watch(loanRepositoryProvider)),
+  (ref) => LoanFormNotifier(ref.watch(loanRepositoryProvider), ref),
 );
