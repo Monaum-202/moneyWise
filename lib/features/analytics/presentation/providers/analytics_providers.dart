@@ -27,15 +27,15 @@ final analyticsDateRangeProvider = Provider<DateTimeRange>((ref) {
         end: now,
       ),
     AnalyticsPeriod.month => DateTimeRange(
-        start: DateTime(now.year, now.month),
+        start: DateTime(now.year, now.month, 1),
         end: now,
       ),
     AnalyticsPeriod.year => DateTimeRange(
-        start: DateTime(now.year),
+        start: DateTime(now.year, 1, 1),
         end: now,
       ),
     _ => DateTimeRange(
-        start: DateTime(now.year, now.month),
+        start: DateTime(now.year, now.month, 1),
         end: now,
       ),
   };
@@ -48,42 +48,70 @@ final analyticsSummaryProvider = StreamProvider<TransactionSummary>((ref) {
   return repo.watchSummary(range.start, range.end);
 });
 
+class AnalyticsPieItem {
+  AnalyticsPieItem({
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.categoryId,
+  });
+  final String label;
+  final double value;
+  final Color color;
+  final String categoryId;
+}
+
 // Pie chart data from category totals
-final pieChartDataProvider = Provider<List<Map<String, dynamic>>>((ref) {
+final pieChartDataProvider = Provider<List<AnalyticsPieItem>>((ref) {
   final totals = ref.watch(categoryTotalsProvider).valueOrNull ?? [];
   return totals
-      .map((t) => {
-            'label': t.categoryName,
-            'value': t.total,
-            'color': Color(t.colorValue),
-            'categoryId': t.categoryId,
-          })
+      .map((t) => AnalyticsPieItem(
+            label: t.categoryName,
+            value: t.total,
+            color: Color(t.colorValue),
+            categoryId: t.categoryId,
+          ))
       .toList();
 });
 
+class AnalyticsBarItem {
+  AnalyticsBarItem({
+    required this.date,
+    required this.income,
+    required this.expense,
+  });
+  final String date;
+  final double income;
+  final double expense;
+}
+
 // Bar chart: daily income vs expense for selected period
-final barChartDataProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+final barChartDataProvider = StreamProvider<List<AnalyticsBarItem>>((ref) {
   final range = ref.watch(analyticsDateRangeProvider);
   final repo = ref.watch(transactionRepositoryProvider);
   
-  // Use watchAll and take first to get current list matching the range
-  final transactions = await repo.watchAll(from: range.start, to: range.end).first;
-  final grouped = <String, Map<String, double>>{};
-  
-  for (final t in transactions) {
-    final key = '${t.date.year}-${t.date.month.toString().padLeft(2, '0')}-${t.date.day.toString().padLeft(2, '0')}';
-    grouped[key] ??= {'income': 0, 'expense': 0};
-    if (t.type == TransactionType.income) {
-      grouped[key]!['income'] = (grouped[key]!['income'] ?? 0) + t.amount;
-    } else {
-      grouped[key]!['expense'] = (grouped[key]!['expense'] ?? 0) + t.amount;
+  return repo.watchAll(from: range.start, to: range.end).map((transactions) {
+    final grouped = <String, Map<String, double>>{};
+    
+    for (final t in transactions) {
+      final key = '${t.date.year}-${t.date.month.toString().padLeft(2, '0')}-${t.date.day.toString().padLeft(2, '0')}';
+      grouped[key] ??= {'income': 0, 'expense': 0};
+      if (t.type == TransactionType.income) {
+        grouped[key]!['income'] = (grouped[key]!['income'] ?? 0) + t.amount;
+      } else {
+        grouped[key]!['expense'] = (grouped[key]!['expense'] ?? 0) + t.amount;
+      }
     }
-  }
 
-  return grouped.entries
-      .map((e) => {'date': e.key, ...e.value})
-      .toList()
-    ..sort((a, b) => (a['date'] as String).compareTo(b['date'] as String));
+    return grouped.entries
+        .map((e) => AnalyticsBarItem(
+              date: e.key,
+              income: e.value['income'] ?? 0,
+              expense: e.value['expense'] ?? 0,
+            ))
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+  });
 });
 
 // Smart insights strings
