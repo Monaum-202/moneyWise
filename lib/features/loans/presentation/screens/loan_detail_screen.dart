@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
@@ -49,6 +50,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
 
         final totalRepaid = loan.repayments.fold(0.0, (sum, r) => sum + r.amount);
         final remaining = loan.amount - totalRepaid;
+        final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
 
         return Scaffold(
           body: Stack(
@@ -109,7 +111,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildSummaryCard(loan, remaining, currency, theme),
+                          _buildSummaryCard(loan, remaining, currencySymbol, theme),
                           const SizedBox(height: 32),
                           const Text(
                             'Repayment History',
@@ -186,7 +188,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
     );
   }
 
-  Widget _buildSummaryCard(LoanEntity loan, double remaining, String currency, ThemeData theme) {
+  Widget _buildSummaryCard(LoanEntity loan, double remaining, String symbol, ThemeData theme) {
     return Card(
       elevation: 0,
       color: theme.colorScheme.surfaceContainerLow,
@@ -203,9 +205,27 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
                   children: [
                     Text('Balance Remaining', style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 13)),
                     const SizedBox(height: 4),
-                    Text(
-                      '$currency${remaining.toStringAsFixed(0)}',
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 32, fontFamily: 'Poppins'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '$symbol ',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          TextSpan(
+                            text: remaining.toStringAsFixed(0),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 32,
+                              fontFamily: 'Poppins',
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -216,7 +236,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildInfoItem('Total Amount', '$currency${loan.amount.toStringAsFixed(0)}'),
+                _buildInfoItem('Total Amount', '$symbol${loan.amount.toStringAsFixed(0)}'),
                 _buildInfoItem('Loan Type', loan.type == LoanType.gave ? 'I Gave' : 'I Took'),
               ],
             ),

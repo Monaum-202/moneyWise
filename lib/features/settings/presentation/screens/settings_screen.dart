@@ -7,8 +7,10 @@ import 'package:go_router/go_router.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:moneywise/core/utils/pdf_report_generator.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
+import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -56,7 +58,10 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: DropdownButton<String>(
                   value: settings.currency,
                   items: ['BDT', 'USD', 'EUR', 'GBP', 'INR']
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .map((c) => DropdownMenuItem(
+                            value: c,
+                            child: Text('$c (${CurrencyFormatter.getSymbol(c)})'),
+                          ))
                       .toList(),
                   onChanged: (v) => ref.read(settingsProvider.notifier).setCurrency(v ?? 'BDT'),
                 ),
@@ -186,20 +191,35 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _exportPdf(WidgetRef ref, BuildContext context) async {
-    final repo = ref.read(transactionRepositoryProvider);
+    final transRepo = ref.read(transactionRepositoryProvider);
+    final loanRepo = ref.read(loanRepositoryProvider);
     final monthYear = ref.read(currentMonthYearProvider);
+    final settings = ref.read(settingsProvider).valueOrNull;
+    final currency = settings?.currency ?? '৳';
     
-    final transactions = await repo.watchAll().first;
-    final summary = await repo.watchSummary(DateTime(2000), DateTime(2100)).first;
+    // Fetch data for the current month
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month);
+    final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-    final file = await PdfReportGenerator.generate(
+    final transactions = await transRepo.watchAll(from: startOfMonth, to: endOfMonth).first;
+    final summary = await transRepo.watchSummary(startOfMonth, endOfMonth).first;
+    final categoryTotals = await transRepo.watchCategoryTotals(monthYear).first;
+    final loanSummary = await loanRepo.watchSummary().first;
+    final loans = await loanRepo.watchAll(isPaid: false).first;
+
+    final sortedTransactions = List<TransactionEntity>.from(transactions)
+      ..sort((a, b) => b.amount.compareTo(a.amount));
+
+    await PdfReportGenerator.generate(
+      summary: summary,
+      categoryTotals: categoryTotals,
+      topTransactions: sortedTransactions.take(10).toList(),
+      loanSummary: loanSummary,
+      unsettledLoans: loans,
       monthYear: monthYear,
-      transactions: transactions,
-      totalIncome: summary.totalIncome,
-      totalExpense: summary.totalExpense,
+      currency: currency,
     );
-
-    await Share.shareXFiles([XFile(file.path)], text: 'Moneywise Report $monthYear');
   }
 
   Future<void> _exportData(WidgetRef ref) async {

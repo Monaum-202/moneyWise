@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/analytics/presentation/providers/analytics_providers.dart';
 
 class TrendLineChart extends ConsumerWidget {
@@ -9,6 +11,8 @@ class TrendLineChart extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final barDataAsync = ref.watch(barChartDataProvider);
+    final settings = ref.watch(settingsProvider).valueOrNull;
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     return barDataAsync.when(
@@ -27,14 +31,13 @@ class TrendLineChart extends ConsumerWidget {
           );
         }
 
-        // Calculate cumulative daily spend (expense only)
         double cumulative = 0;
         final spots = <FlSpot>[];
         double totalSpend = 0;
 
         for (var i = 0; i < data.length; i++) {
-          cumulative += data[i]['expense'] as double;
-          totalSpend += data[i]['expense'] as double;
+          cumulative += data[i].expense;
+          totalSpend += data[i].expense;
           spots.add(FlSpot(i.toDouble(), cumulative));
         }
 
@@ -78,9 +81,9 @@ class TrendLineChart extends ConsumerWidget {
                   getTooltipColor: (_) => theme.colorScheme.surfaceContainerHigh,
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((spot) {
-                      final date = data[spot.x.toInt()]['date'] as String;
+                      final date = data[spot.x.toInt()].date;
                       return LineTooltipItem(
-                        '$date\n৳${spot.y.toStringAsFixed(0)}',
+                        '$date\n$currencySymbol${spot.y.toStringAsFixed(0)}',
                         TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold),
                       );
                     }).toList();

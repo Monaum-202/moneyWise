@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 
 class AmountInputWidget extends ConsumerStatefulWidget {
@@ -55,17 +56,20 @@ class _AmountInputWidgetState extends ConsumerState<AmountInputWidget> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencyCode = settings?.currency ?? 'BDT';
+    final currencySymbol = CurrencyFormatter.getSymbol(currencyCode);
     final theme = Theme.of(context);
 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              currency,
-              style: theme.textTheme.displaySmall?.copyWith(
+              currencySymbol,
+              style: theme.textTheme.headlineSmall?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),

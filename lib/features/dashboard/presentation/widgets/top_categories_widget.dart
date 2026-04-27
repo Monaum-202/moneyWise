@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/icon_helper.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
@@ -13,7 +14,7 @@ class TopCategoriesWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final totalsAsync = ref.watch(categoryTotalsProvider);
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     return totalsAsync.when(
@@ -60,8 +61,14 @@ class TopCategoriesWidget extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(t.categoryName, style: const TextStyle(fontWeight: FontWeight.w500)),
-                            Text('$currency${t.total.toStringAsFixed(0)}', 
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(text: '$currencySymbol ', style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                                  TextSpan(text: t.total.toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),

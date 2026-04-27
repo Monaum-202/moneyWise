@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/icon_helper.dart';
 import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
 
 class BudgetRowWidget extends ConsumerStatefulWidget {
-
   const BudgetRowWidget({
-    required this.data, super.key,
+    required this.data,
+    super.key,
   });
   final CategoryBudget data;
 
@@ -42,15 +43,15 @@ class _BudgetRowWidgetState extends ConsumerState<BudgetRowWidget> {
           monthYear,
           limit,
         );
-    setState(() => _isEditing = false);
+    if (mounted) setState(() => _isEditing = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
-    
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
+
     final category = widget.data.category;
     final progress = widget.data.percentage;
 
@@ -86,9 +87,20 @@ class _BudgetRowWidgetState extends ConsumerState<BudgetRowWidget> {
                         category.name,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
                       ),
-                      Text(
-                        '$currency${widget.data.spentAmount.toStringAsFixed(0)} spent of ${widget.data.limitAmount > 0 ? "$currency${widget.data.limitAmount.toStringAsFixed(0)}" : "no limit"}',
-                        style: theme.textTheme.bodySmall,
+                      RichText(
+                        text: TextSpan(
+                          style: theme.textTheme.bodySmall,
+                          children: [
+                            TextSpan(text: currencySymbol, style: const TextStyle(fontSize: 10)),
+                            TextSpan(text: widget.data.spentAmount.toStringAsFixed(0)),
+                            const TextSpan(text: ' spent of '),
+                            if (widget.data.limitAmount > 0) ...[
+                              TextSpan(text: currencySymbol, style: const TextStyle(fontSize: 10)),
+                              TextSpan(text: widget.data.limitAmount.toStringAsFixed(0)),
+                            ] else
+                              const TextSpan(text: 'no limit'),
+                          ],
+                        ),
                       ),
                     ],
                   ),

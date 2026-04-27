@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/shared/widgets/loading_shimmer.dart';
@@ -11,9 +12,9 @@ class BalanceSummaryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(monthlySummaryProvider);
-    final settingsAsync = ref.watch(settingsProvider);
+    final settings = ref.watch(settingsProvider).valueOrNull;
     final theme = Theme.of(context);
-    final currency = settingsAsync.valueOrNull?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
 
     return summaryAsync.when(
       data: (summary) => Container(
@@ -50,12 +51,25 @@ class BalanceSummaryCard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '$currency${summary.netBalance.toStringAsFixed(0)}',
-                  style: theme.textTheme.displaySmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$currencySymbol ',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      TextSpan(
+                        text: summary.netBalance.toStringAsFixed(0),
+                        style: theme.textTheme.displaySmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ],
                   ),
                 ).animate().fadeIn().slideX(begin: -0.2),
                 if (summary.savingsRate > 0)
@@ -81,7 +95,7 @@ class BalanceSummaryCard extends ConsumerWidget {
                 _SummaryChip(
                   label: 'Income',
                   amount: summary.totalIncome,
-                  currency: currency,
+                  symbol: currencySymbol,
                   icon: Icons.arrow_upward_rounded,
                   color: const Color(0xFF1D9E75),
                 ),
@@ -89,7 +103,7 @@ class BalanceSummaryCard extends ConsumerWidget {
                 _SummaryChip(
                   label: 'Expense',
                   amount: summary.totalExpense,
-                  currency: currency,
+                  symbol: currencySymbol,
                   icon: Icons.arrow_downward_rounded,
                   color: const Color(0xFFE05C5C),
                 ),
@@ -105,17 +119,17 @@ class BalanceSummaryCard extends ConsumerWidget {
 }
 
 class _SummaryChip extends StatelessWidget {
-
   const _SummaryChip({
     required this.label,
     required this.amount,
-    required this.currency,
+    required this.symbol,
     required this.icon,
     required this.color,
   });
+
   final String label;
   final double amount;
-  final String currency;
+  final String symbol;
   final IconData icon;
   final Color color;
 
@@ -144,12 +158,25 @@ class _SummaryChip extends StatelessWidget {
                     label,
                     style: const TextStyle(color: Colors.white70, fontSize: 10),
                   ),
-                  Text(
-                    '$currency${amount.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: symbol,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                        TextSpan(
+                          text: amount.toStringAsFixed(0),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

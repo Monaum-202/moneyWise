@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/features/loans/presentation/widgets/overdue_badge_widget.dart';
@@ -17,7 +18,7 @@ class LoanCardWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     final totalRepaid = loan.repayments.fold(0.0, (sum, r) => sum + r.amount);
@@ -76,9 +77,19 @@ class LoanCardWidget extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          '$currency${loan.amount.toStringAsFixed(0)}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: currencySymbol,
+                                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
+                              TextSpan(
+                                text: loan.amount.toStringAsFixed(0),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 4),
                         _buildTypeBadge(),

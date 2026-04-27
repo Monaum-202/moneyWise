@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/core/utils/icon_helper.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
@@ -25,6 +26,7 @@ class TransactionListTile extends ConsumerWidget {
     final category = categoryMap[transaction.categoryId];
     final currency = settings?.currency ?? '৳';
     final theme = Theme.of(context);
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
 
     final isExpense = transaction.type == TransactionType.expense;
 
@@ -77,12 +79,25 @@ class TransactionListTile extends ConsumerWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: Text(
-            '${isExpense ? "-" : "+"}$currency${transaction.amount.toStringAsFixed(0)}',
-            style: TextStyle(
-              color: isExpense ? const Color(0xFFE05C5C) : const Color(0xFF1D9E75),
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+          trailing: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '${isExpense ? "-" : "+"}$currencySymbol ',
+                  style: TextStyle(
+                    color: isExpense ? const Color(0xFFE05C5C) : const Color(0xFF1D9E75),
+                    fontSize: 12,
+                  ),
+                ),
+                TextSpan(
+                  text: transaction.amount.toStringAsFixed(0),
+                  style: TextStyle(
+                    color: isExpense ? const Color(0xFFE05C5C) : const Color(0xFF1D9E75),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

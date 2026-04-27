@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/budget/presentation/widgets/budget_row_widget.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
@@ -13,7 +14,7 @@ class BudgetScreen extends ConsumerWidget {
     final monthYear = ref.watch(currentMonthYearProvider);
     final budgets = ref.watch(categoryBudgetProvider);
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     // Parse monthYear "2024-10" to DateTime
@@ -64,7 +65,7 @@ class BudgetScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildOverviewCard(currency, totalBudget, totalSpent, remaining, totalProgress, theme),
+                _buildOverviewCard(currencySymbol, totalBudget, totalSpent, remaining, totalProgress, theme),
                 const SizedBox(height: 24),
                 ...budgets.map((b) => BudgetRowWidget(data: b)),
               ],
@@ -75,7 +76,7 @@ class BudgetScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOverviewCard(String currency, double total, double spent, double remaining, double progress, ThemeData theme) {
+  Widget _buildOverviewCard(String symbol, double total, double spent, double remaining, double progress, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -88,14 +89,19 @@ class BudgetScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _OverviewItem(label: 'Total Budget', amount: total, currency: currency),
-              _OverviewItem(label: 'Remaining', amount: remaining, currency: currency),
+              _OverviewItem(label: 'Total Budget', amount: total, symbol: symbol),
+              _OverviewItem(label: 'Remaining', amount: remaining, symbol: symbol),
             ],
           ),
           const SizedBox(height: 24),
-          Text(
-            'Spent: $currency${spent.toStringAsFixed(0)}',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          RichText(
+            text: TextSpan(
+              children: [
+                const TextSpan(text: 'Spent: ', style: TextStyle(color: Colors.white70)),
+                TextSpan(text: '$symbol ', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                TextSpan(text: spent.toStringAsFixed(0), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           ClipRRect(
@@ -115,10 +121,10 @@ class BudgetScreen extends ConsumerWidget {
 
 class _OverviewItem extends StatelessWidget {
 
-  const _OverviewItem({required this.label, required this.amount, required this.currency});
+  const _OverviewItem({required this.label, required this.amount, required this.symbol});
   final String label;
   final double amount;
-  final String currency;
+  final String symbol;
 
   @override
   Widget build(BuildContext context) {
@@ -126,9 +132,19 @@ class _OverviewItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-        Text(
-          '$currency${amount.toStringAsFixed(0)}',
-          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '$symbol ',
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              TextSpan(
+                text: amount.toStringAsFixed(0),
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Poppins'),
+              ),
+            ],
+          ),
         ),
       ],
     );
