@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moneywise/features/analytics/presentation/screens/analytics_screen.dart';
+import 'package:moneywise/features/budget/presentation/screens/budget_screen.dart';
 import 'package:moneywise/features/categories/presentation/screens/categories_screen.dart';
 import 'package:moneywise/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:moneywise/features/loans/presentation/screens/loan_detail_screen.dart';
 import 'package:moneywise/features/loans/presentation/screens/loans_screen.dart';
 import 'package:moneywise/features/settings/presentation/screens/lock_screen.dart';
+import 'package:moneywise/features/settings/presentation/screens/pin_setup_screen.dart';
 import 'package:moneywise/features/settings/presentation/screens/settings_screen.dart';
 import 'package:moneywise/features/transactions/presentation/screens/transactions_screen.dart';
 import 'package:moneywise/routing/route_names.dart';
@@ -58,6 +60,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/categories',
             name: 'categories',
             builder: (context, state) => const CategoriesScreen(),
+          ),
+          GoRoute(
+            path: '/pin-setup',
+            name: 'pin-setup',
+            builder: (context, state) => const PinSetupScreen(),
+          ),
+          GoRoute(
+            path: '/budget',
+            name: 'budget',
+            builder: (context, state) => const BudgetScreen(),
           ),
         ],
       ),

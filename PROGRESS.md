@@ -18,19 +18,9 @@
 - [x] Transaction Summary Model
 - [x] Enums (TransactionType, LoanType, RecurringType)
 
-| Model | Isar Collection | Freezed Entity |
-|-------|----------------|----------------|
-| Transaction | transactionModels | TransactionEntity |
-| Loan | loanModels | LoanEntity |
-| Category | categoryModels | CategoryEntity |
-| Budget | budgetModels | BudgetEntity |
-
 ## Part 4: Database & Repositories [x]
 - [x] Initialize Isar with all schemas
-- [x] Create `ITransactionRepository` & `TransactionRepositoryImpl`
-- [x] Create `ILoanRepository` & `LoanRepositoryImpl`
-- [x] Create `ICategoryRepository` & `CategoryRepositoryImpl`
-- [x] Create `IBudgetRepository` & `BudgetRepositoryImpl`
+- [x] Repository interfaces and implementations
 - [x] Shared models: `CategoryTotal`, `LoanSummary`
 - [x] Repository Providers
 - [x] Unit tests for Repositories
@@ -49,23 +39,29 @@
 - [x] Dashboard Screen
 - [x] Balance Summary & Insights
 - [x] Transaction List & Tiles
-- [x] Amount Input (Custom Numpad)
-- [x] Category Picker
-- [x] Add Transaction Sheet (Reactive Form)
-- [x] All Transactions List (Grouped by Date)
+- [x] Add Transaction Sheet
 
 ## Part 7: Features UI (Loans & Categories) [x]
 - [x] Loans Module (List, Detail, Add Loan, Repayments)
 - [x] Categories Module (Grid, Add Category, Icon/Color Pickers)
 - [x] Biometric Lock (Lock Screen + Auto-lock logic)
 
+## Part 8: Final Polish & Optimization [x]
+- [x] Analytics Screen (Charts & Insights)
+- [x] Budget Screen (Month Navigator & Monthly Limits)
+- [x] Settings Screen (Preferences & Security)
+- [x] Data Export/Import (JSON & PDF)
+- [x] Final Linter & Build cleanup
+
 ### Feature Status
 
 | Feature | Screens | Status |
 |---------|---------|--------|
+| Dashboard | DashboardScreen | ✓ |
+| Transactions | TransactionsScreen, AddTransactionSheet | ✓ |
 | Loans | LoansScreen, LoanDetailScreen, AddLoanSheet, AddRepaymentSheet | ✓ |
 | Categories | CategoriesScreen, AddCategorySheet | ✓ |
+| Analytics | AnalyticsScreen | ✓ |
+| Budget | BudgetScreen | ✓ |
+| Settings | SettingsScreen, PinSetupScreen | ✓ |
 | Security | LockScreen + auto-lock | ✓ |
-
-## Part 8: Final Polish & Optimization [ ]
-...

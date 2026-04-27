@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:moneywise/features/analytics/presentation/providers/analytics_providers.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/balance_summary_card.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/recent_transactions_widget.dart';
@@ -82,6 +83,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
             actions: [
+              IconButton(
+                onPressed: () => context.push('/categories'),
+                icon: const Icon(Icons.category_rounded),
+                tooltip: 'Categories',
+              ),
+              IconButton(
+                onPressed: () => context.push('/budget'),
+                icon: const Icon(Icons.account_balance_wallet_rounded),
+                tooltip: 'Budget',
+              ),
               IconButton(
                 onPressed: () {},
                 icon: const Icon(Icons.notifications_none_rounded),
