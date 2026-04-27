@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
+import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
 import 'package:moneywise/features/transactions/domain/i_transaction_repository.dart';
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_filter.dart';
@@ -45,8 +47,9 @@ final categoryTotalsProvider = StreamProvider<List<CategoryTotal>>((ref) {
 
 // Transaction form notifier
 class TransactionFormNotifier extends StateNotifier<TransactionEntity?> {
-  TransactionFormNotifier(this._repo) : super(null);
+  TransactionFormNotifier(this._repo, this.ref) : super(null);
   final ITransactionRepository _repo;
+  final Ref ref;
 
   void initNew() => state = TransactionEntity(
         uuid: const Uuid().v4(),
@@ -79,9 +82,34 @@ class TransactionFormNotifier extends StateNotifier<TransactionEntity?> {
       } else {
         await _repo.add(state!);
       }
+      
+      if (state!.type == TransactionType.expense) {
+        _checkBudgetAlerts();
+      }
+      
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  Future<void> _checkBudgetAlerts() async {
+    final monthYear = ref.read(currentMonthYearProvider);
+    final categoryMap = ref.read(categoryMapProvider);
+    final category = categoryMap[state!.categoryId];
+    
+    if (category != null) {
+      final totals = await ref.read(categoryTotalsProvider.future);
+      final spent = totals.firstWhere(
+        (t) => t.categoryId == category.uuid, 
+        orElse: () => const CategoryTotal(categoryId: '', categoryName: '', total: 0, colorValue: 0, iconCodePoint: 0)
+      ).total;
+      
+      await ref.read(budgetAlertServiceProvider).checkAndTriggerAlert(
+        category: category,
+        monthYear: monthYear,
+        spent: spent,
+      );
     }
   }
 
@@ -96,5 +124,5 @@ class TransactionFormNotifier extends StateNotifier<TransactionEntity?> {
 }
 
 final transactionFormProvider = StateNotifierProvider.autoDispose<TransactionFormNotifier, TransactionEntity?>(
-  (ref) => TransactionFormNotifier(ref.watch(transactionRepositoryProvider)),
+  (ref) => TransactionFormNotifier(ref.watch(transactionRepositoryProvider), ref),
 );
