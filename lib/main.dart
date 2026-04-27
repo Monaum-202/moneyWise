@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:moneywise/app.dart';
+import 'package:moneywise/core/services/notification_service.dart';
 import 'package:moneywise/core/utils/logger.dart';
 import 'package:moneywise/features/budget/domain/budget_model.dart';
 import 'package:moneywise/features/categories/domain/category_model.dart';
@@ -20,6 +21,10 @@ class PreloadedIsar extends IsarNotifier {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  logger.i('Initializing Notifications...');
+  final notificationService = NotificationService();
+  await notificationService.init();
+
   logger.i('Initializing Database...');
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
