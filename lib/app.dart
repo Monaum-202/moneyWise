@@ -64,7 +64,7 @@ class _MoneywiseAppState extends ConsumerState<MoneywiseApp> {
           }
         }
       });
-    }, fireImmediately: true);
+    });
 
     return MaterialApp.router(
       title: AppStrings.appName,
