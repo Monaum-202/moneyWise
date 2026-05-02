@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
+import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/shared/enums/transaction_type.dart';
 import 'package:moneywise/shared/models/transaction_summary.dart';
@@ -118,6 +120,9 @@ final barChartDataProvider = StreamProvider<List<AnalyticsBarItem>>((ref) {
 final insightsProvider = Provider<List<String>>((ref) {
   final summary = ref.watch(monthlySummaryProvider).valueOrNull;
   final totals = ref.watch(categoryTotalsProvider).valueOrNull ?? [];
+  final settings = ref.watch(settingsProvider).valueOrNull;
+  final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
+  
   if (summary == null) return [];
   final insights = <String>[];
 
@@ -129,7 +134,7 @@ final insightsProvider = Provider<List<String>>((ref) {
   }
   if (totals.isNotEmpty) {
     final top = totals.reduce((a, b) => a.total > b.total ? a : b);
-    insights.add('Biggest spend: ${top.categoryName} — ৳${top.total.toStringAsFixed(0)}');
+    insights.add('Biggest spend: ${top.categoryName} — $currencySymbol${top.total.toStringAsFixed(0)}');
   }
   return insights;
 });

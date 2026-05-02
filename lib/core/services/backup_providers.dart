@@ -4,6 +4,7 @@ import 'package:isar/isar.dart';
 import 'package:moneywise/core/services/drive_backup_result.dart';
 import 'package:moneywise/core/services/drive_backup_service.dart';
 import 'package:moneywise/core/services/google_auth_service.dart';
+import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
@@ -38,18 +39,23 @@ class BackupNotifier extends StateNotifier<BackupStatus> {
     _ref.read(googleAccountProvider.notifier).state = null;
   }
 
-  Future<DriveBackupResult> backup() async {
+  Future<DriveBackupResult> backup({bool isAuto = false, bool force = false}) async {
     state = BackupStatus.loading;
-    final result = await DriveBackupService.backup(_isar);
-    state = result is BackupSuccess
-        ? BackupStatus.success : BackupStatus.failure;
+    final result = await DriveBackupService.backup(_isar, isAuto: isAuto, force: force);
     
     if (result is BackupSuccess) {
+      state = BackupStatus.success;
       _ref.invalidate(lastBackupInfoProvider);
+    } else if (result is BackupOverwriteWarning) {
+      state = BackupStatus.idle; // Let UI handle the warning
+    } else {
+      state = BackupStatus.failure;
     }
     
-    await Future.delayed(const Duration(seconds: 2));
-    state = BackupStatus.idle;
+    if (state != BackupStatus.idle) {
+      await Future.delayed(const Duration(seconds: 2));
+      state = BackupStatus.idle;
+    }
     return result;
   }
 
@@ -66,9 +72,16 @@ class BackupNotifier extends StateNotifier<BackupStatus> {
     state = BackupStatus.success;
     
     // Invalidate all data providers so UI refreshes
-    _ref.invalidate(transactionListProvider);
-    _ref.invalidate(loanListProvider);
-    _ref.invalidate(categoryListProvider);
+    _ref
+      ..invalidate(transactionListProvider)
+      ..invalidate(monthlySummaryProvider)
+      ..invalidate(totalBalanceProvider)
+      ..invalidate(categoryTotalsProvider)
+      ..invalidate(categoryListProvider)
+      ..invalidate(loanListProvider)
+      ..invalidate(loanSummaryProvider)
+      ..invalidate(budgetListProvider)
+      ..invalidate(lastBackupInfoProvider);
     
     await Future.delayed(const Duration(seconds: 2));
     state = BackupStatus.idle;

@@ -5,6 +5,9 @@ import 'package:moneywise/core/services/notification_service.dart';
 import 'package:moneywise/core/services/drive_backup_service.dart';
 import 'package:moneywise/core/services/google_auth_service.dart';
 import 'package:moneywise/core/theme/app_theme.dart';
+import 'package:moneywise/features/categories/domain/category_model.dart';
+import 'package:moneywise/features/transactions/domain/transaction_model.dart';
+import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
@@ -41,8 +44,14 @@ class _MoneywiseAppState extends ConsumerState<MoneywiseApp> {
 
     if (isSignedIn && autoBackup) {
       final isar = ref.read(isarProvider);
+      
+      // Safety Check: Don't auto-backup if local data is empty to avoid overwriting cloud backups
+      final tCount = await isar.transactionModels.count();
+      final lCount = await isar.loanModels.count();
+      if (tCount == 0 && lCount == 0) return;
+
       // Fire and forget backup in background
-      DriveBackupService.backup(isar);
+      DriveBackupService.backup(isar, isAuto: true);
     }
   }
 
