@@ -1,12 +1,15 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
 
 class NotificationService {
   static final _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  static String _currencyCode = 'BDT';
 
-  static Future<void> init() async {
+  static Future<void> init(String currencyCode) async {
+    _currencyCode = currencyCode;
     tz.initializeTimeZones();
     
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -36,10 +39,12 @@ class NotificationService {
 
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
+    final symbol = CurrencyFormatter.getSymbol(_currencyCode);
+
     await _notificationsPlugin.zonedSchedule(
       id: loan.uuid.hashCode,
       title: 'Loan due tomorrow 💸',
-      body: '৳${loan.amount.toStringAsFixed(0)} ${loan.type.name == "gave" ? "from" : "to"} ${loan.personName} is due tomorrow',
+      body: '$symbol${loan.amount.toStringAsFixed(0)} ${loan.type.name == "gave" ? "from" : "to"} ${loan.personName} is due tomorrow',
       scheduledDate: scheduledDate,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(

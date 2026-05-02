@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
@@ -16,7 +17,7 @@ class RepaymentTimelineWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     if (repayments.isEmpty) {
@@ -33,7 +34,7 @@ class RepaymentTimelineWidget extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSummaryBar(currency, totalRepaid, totalLoan, percentage, theme),
+        _buildSummaryBar(currencySymbol, totalRepaid, totalLoan, percentage, theme),
         const SizedBox(height: 24),
         ListView.builder(
           shrinkWrap: true,
@@ -42,7 +43,7 @@ class RepaymentTimelineWidget extends ConsumerWidget {
           itemBuilder: (context, index) {
             final repayment = repayments[index];
             final isLatest = index == 0;
-            return _buildTimelineEntry(repayment, isLatest, theme, currency);
+            return _buildTimelineEntry(repayment, isLatest, theme, currencySymbol);
           },
         ),
       ],
