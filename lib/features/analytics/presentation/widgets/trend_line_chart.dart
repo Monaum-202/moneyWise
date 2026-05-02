@@ -18,14 +18,17 @@ class TrendLineChart extends ConsumerWidget {
     return barDataAsync.when(
       data: (data) {
         if (data.isEmpty) {
-          return const SizedBox(
+          return SizedBox(
             height: 200,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.show_chart_rounded, size: 48, color: theme.colorScheme.outline),
                 const SizedBox(height: 16),
-                Text('No trend data available', style: TextStyle(color: theme.colorScheme.outline)),
+                Text(
+                  'No trend data available',
+                  style: TextStyle(color: theme.colorScheme.outline),
+                ),
               ],
             ),
           );
@@ -58,7 +61,6 @@ class TrendLineChart extends ConsumerWidget {
                   barWidth: 3,
                   isStrokeCapRound: true,
                   dotData: FlDotData(
-                    show: true,
                     getDotPainter: (spot, xPercentage, bar, index) => FlDotCirclePainter(
                       radius: 3,
                       color: theme.colorScheme.surface,

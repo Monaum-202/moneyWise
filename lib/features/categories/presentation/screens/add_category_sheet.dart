@@ -60,7 +60,7 @@ class _AddCategorySheetState extends ConsumerState<AddCategorySheet> {
           controller: scrollController,
           children: [
             const SizedBox(height: 12),
-            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
+            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: theme.colorScheme.outlineVariant, borderRadius: BorderRadius.circular(2)))),
             const SizedBox(height: 24),
             const Text('Preview', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
@@ -131,7 +131,15 @@ class _AddCategorySheetState extends ConsumerState<AddCategorySheet> {
                 
                 if (mounted) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.category == null ? 'Category added ✓' : 'Category updated ✓')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: theme.colorScheme.onSurface,
+                      content: Text(
+                        widget.category == null ? 'Category added ✓' : 'Category updated ✓',
+                        style: TextStyle(color: theme.colorScheme.surface),
+                      ),
+                    ),
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(

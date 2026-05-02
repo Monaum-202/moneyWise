@@ -46,9 +46,11 @@ class TransactionListTile extends ConsumerWidget {
         ref.read(transactionFormProvider.notifier).delete(transaction.uuid);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Transaction deleted'),
+            backgroundColor: theme.colorScheme.onSurface,
+            content: Text('Transaction deleted', style: TextStyle(color: theme.colorScheme.surface)),
             action: SnackBarAction(
               label: 'Undo',
+              textColor: theme.colorScheme.primary,
               onPressed: () {
                 ref.read(transactionRepositoryProvider).add(transaction);
               },
@@ -92,14 +94,14 @@ class TransactionListTile extends ConsumerWidget {
                 TextSpan(
                   text: '${isExpense ? "-" : "+"}$currencySymbol ',
                   style: TextStyle(
-                    color: isExpense ? const Color(0xFFE05C5C) : const Color(0xFF1D9E75),
+                    color: isExpense ? theme.colorScheme.error : theme.colorScheme.secondary,
                     fontSize: 12,
                   ),
                 ),
                 TextSpan(
                   text: transaction.amount.toStringAsFixed(0),
                   style: TextStyle(
-                    color: isExpense ? const Color(0xFFE05C5C) : const Color(0xFF1D9E75),
+                    color: isExpense ? theme.colorScheme.error : theme.colorScheme.secondary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),

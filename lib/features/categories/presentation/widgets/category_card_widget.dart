@@ -21,19 +21,21 @@ class CategoryCardWidget extends ConsumerWidget {
     final settings = ref.watch(settingsProvider).valueOrNull;
     final currency = settings?.currency ?? '৳';
     
+    final theme = Theme.of(context);
+    
     final budget = category.monthlyBudget;
     final progress = budget > 0 ? (spentThisMonth / budget).clamp(0.0, 1.0) : 0.0;
     
-    Color progressColor = Colors.green;
+    Color progressColor = theme.colorScheme.secondary;
     if (progress >= 0.9) {
-      progressColor = Colors.red;
+      progressColor = theme.colorScheme.error;
     } else if (progress >= 0.7) {
-      progressColor = Colors.orange;
+      progressColor = Colors.orange; // Tertiary might be a good fit if defined
     }
 
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
@@ -54,7 +56,7 @@ class CategoryCardWidget extends ConsumerWidget {
                       child: CircularProgressIndicator(
                         value: progress,
                         strokeWidth: 3,
-                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.1),
                         color: progressColor,
                       ),
                     ),

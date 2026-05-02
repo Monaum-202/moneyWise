@@ -48,7 +48,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
     }
 
     final isExpense = transaction.type == TransactionType.expense;
-    final accentColor = isExpense ? const Color(0xFFE05C5C) : const Color(0xFF1D9E75);
+    final accentColor = isExpense ? theme.colorScheme.error : theme.colorScheme.secondary;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
@@ -72,7 +72,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: theme.colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -95,7 +95,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 onSelectionChanged: (set) => notifier.updateType(set.first),
                 style: SegmentedButton.styleFrom(
                   selectedBackgroundColor: accentColor,
-                  selectedForegroundColor: Colors.white,
+                  selectedForegroundColor: theme.colorScheme.onSecondary,
                 ),
               ),
               const SizedBox(height: 32),
@@ -178,7 +178,13 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     if (success && mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(widget.initialTransaction != null ? 'Transaction updated ✓' : 'Transaction added ✓')),
+                        SnackBar(
+                          backgroundColor: theme.colorScheme.onSurface,
+                          content: Text(
+                            widget.initialTransaction != null ? 'Transaction updated ✓' : 'Transaction added ✓',
+                            style: TextStyle(color: theme.colorScheme.surface),
+                          ),
+                        ),
                       );
                     }
                   } else {

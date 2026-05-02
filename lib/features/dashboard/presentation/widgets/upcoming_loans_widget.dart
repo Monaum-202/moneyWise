@@ -52,7 +52,7 @@ class UpcomingLoansWidget extends ConsumerWidget {
                       color: theme.colorScheme.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isOverdue ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
+                        color: isOverdue ? theme.colorScheme.error.withValues(alpha: 0.3) : Colors.transparent,
                       ),
                     ),
                     child: Row(
@@ -76,7 +76,7 @@ class UpcomingLoansWidget extends ConsumerWidget {
                               Text(
                                 DateFormatter.formatDayMonth(loan.dueDate!),
                                 style: TextStyle(
-                                  color: isOverdue ? Colors.red : theme.colorScheme.onSurfaceVariant,
+                                  color: isOverdue ? theme.colorScheme.error : theme.colorScheme.onSurfaceVariant,
                                   fontSize: 11,
                                 ),
                               ),

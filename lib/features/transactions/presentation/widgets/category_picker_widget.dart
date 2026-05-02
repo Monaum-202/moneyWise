@@ -34,14 +34,14 @@ class CategoryPickerWidget extends ConsumerWidget {
                 avatar: Icon(
                   IconHelper.getIcon(category.iconCodePoint),
                   size: 16,
-                  color: isSelected ? theme.colorScheme.onPrimary : Color(category.colorValue),
+                  color: isSelected ? theme.colorScheme.onSecondary : Color(category.colorValue),
                 ),
                 selected: isSelected,
                 onSelected: (_) => onSelected(category.uuid),
-                selectedColor: Color(category.colorValue),
-                checkmarkColor: theme.colorScheme.onPrimary,
+                selectedColor: theme.colorScheme.secondary.withValues(alpha: 0.8),
+                checkmarkColor: theme.colorScheme.onSecondary,
                 labelStyle: TextStyle(
-                  color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                  color: isSelected ? theme.colorScheme.onSecondary : theme.colorScheme.onSurface,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ).animate(target: isSelected ? 1 : 0).scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05)),
