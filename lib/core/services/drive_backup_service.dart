@@ -13,20 +13,45 @@ class DriveBackupService {
   static const _appDataFolder = 'appDataFolder';
 
   // ─── BACKUP ──────────────────────────────────────────
-  static Future<DriveBackupResult> backup(Isar isar) async {
+  static Future<DriveBackupResult> backup(Isar isar, {bool isAuto = false, bool force = false}) async {
     try {
       final client = await GoogleAuthService.getAuthClient();
       if (client == null) return const DriveBackupResult.notSignedIn();
 
       final driveApi = drive.DriveApi(client);
 
-      // 1. Generate JSON from all Isar data
-      final jsonData = await _generateBackupJson(isar);
-      final bytes = utf8.encode(jsonData);
-      final stream = Stream.fromIterable([bytes]);
+      // 1. Check if local data is empty
+      final tCount = await isar.transactionModels.count();
+      final lCount = await isar.loanModels.count();
+      final isLocalEmpty = tCount == 0 && lCount == 0;
 
       // 2. Check if backup file already exists in appDataFolder
       final existingId = await _findExistingBackupId(driveApi);
+
+      // Safety: Never overwrite with empty data if it's an auto-backup
+      if (isAuto && isLocalEmpty && existingId != null) {
+        client.close();
+        return const DriveBackupResult.failure('Remote backup exists, skipping empty auto-backup');
+      }
+
+      // Safety: If manual backup and local is empty but remote exists, warn user
+      if (!isAuto && !force && isLocalEmpty && existingId != null) {
+        final file = await driveApi.files.get(existingId, $fields: 'modifiedTime,size');
+        if (file is drive.File) {
+          client.close();
+          return DriveBackupResult.overwriteWarning(
+            remoteMetadata: BackupMetadata(
+              lastBackupTime: file.modifiedTime?.toLocal() ?? DateTime.now(),
+              sizeBytes: int.tryParse(file.size ?? '0') ?? 0,
+            ),
+          );
+        }
+      }
+
+      // 3. Generate JSON from all Isar data
+      final jsonData = await _generateBackupJson(isar);
+      final bytes = utf8.encode(jsonData);
+      final stream = Stream.fromIterable([bytes]);
 
       final driveFile = drive.File()
         ..name = _backupFileName
@@ -35,7 +60,7 @@ class DriveBackupService {
       final media = drive.Media(stream, bytes.length,
           contentType: 'application/json');
 
-      // 3. Update existing OR create new
+      // 4. Update existing OR create new
       if (existingId != null) {
         await driveApi.files.update(driveFile, existingId,
             uploadMedia: media);
@@ -65,20 +90,37 @@ class DriveBackupService {
       if (fileId == null) return const DriveRestoreResult.noBackupFound();
 
       // Download file content
-      final response = await driveApi.files.get(
+      final dynamic response = await driveApi.files.get(
         fileId,
         downloadOptions: drive.DownloadOptions.fullMedia,
-      ) as drive.Media;
+      );
+
+      if (response is! drive.Media) {
+        return const DriveRestoreResult.failure('Invalid response from Google Drive');
+      }
 
       final List<int> chunks = [];
       await for (final chunk in response.stream) {
         chunks.addAll(chunk);
       }
+      
+      if (chunks.isEmpty) {
+        return const DriveRestoreResult.failure('Backup file is empty');
+      }
+      
       final jsonString = utf8.decode(chunks);
 
       // Parse backup info before importing
-      final Map<String, dynamic> backupMap = jsonDecode(jsonString);
-      final meta = BackupMetadata.fromJson(backupMap['metadata']);
+      final dynamic decoded = jsonDecode(jsonString);
+      if (decoded is! Map) {
+        return const DriveRestoreResult.failure('Invalid backup format');
+      }
+      
+      final Map<String, dynamic> backupMap = Map<String, dynamic>.from(decoded);
+      final metaData = backupMap['metadata'];
+      final meta = BackupMetadata.fromJson(
+        metaData is Map ? Map<String, dynamic>.from(metaData) : null,
+      );
 
       client.close();
       return DriveRestoreResult.ready(
@@ -92,7 +134,11 @@ class DriveBackupService {
 
   // ─── IMPORT to Isar after user confirms ──────────────
   static Future<void> importToIsar(Isar isar, String jsonString) async {
-    final map = jsonDecode(jsonString) as Map<String, dynamic>;
+    if (jsonString.isEmpty) return;
+    final dynamic decoded = jsonDecode(jsonString);
+    if (decoded is! Map) return;
+    final map = Map<String, dynamic>.from(decoded);
+
     await isar.writeTxn(() async {
       // Clear existing data
       await isar.transactionModels.clear();
@@ -101,28 +147,72 @@ class DriveBackupService {
       await isar.budgetModels.clear();
 
       // Import categories
-      final catList = (map['categories'] as List)
-          .map((e) => _catToModel(CategoryEntity.fromJson(Map<String, dynamic>.from(e))))
-          .toList();
-      await isar.categoryModels.putAll(catList);
+      final categoriesData = map['categories'];
+      if (categoriesData is List) {
+        final catList = categoriesData
+            .whereType<Map>()
+            .map((e) {
+              try {
+                return _catToModel(CategoryEntity.fromJson(Map<String, dynamic>.from(e)));
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<CategoryModel>()
+            .toList();
+        if (catList.isNotEmpty) await isar.categoryModels.putAll(catList);
+      }
 
       // Import budgets
-      final budgetList = (map['budgets'] as List? ?? [])
-          .map((e) => _budgetToModel(BudgetEntity.fromJson(Map<String, dynamic>.from(e))))
-          .toList();
-      await isar.budgetModels.putAll(budgetList);
+      final budgetsData = map['budgets'];
+      if (budgetsData is List) {
+        final budgetList = budgetsData
+            .whereType<Map>()
+            .map((e) {
+              try {
+                return _budgetToModel(BudgetEntity.fromJson(Map<String, dynamic>.from(e)));
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<BudgetModel>()
+            .toList();
+        if (budgetList.isNotEmpty) await isar.budgetModels.putAll(budgetList);
+      }
 
       // Import loans
-      final loanList = (map['loans'] as List)
-          .map((e) => _loanToModel(LoanEntity.fromJson(Map<String, dynamic>.from(e))))
-          .toList();
-      await isar.loanModels.putAll(loanList);
+      final loansData = map['loans'];
+      if (loansData is List) {
+        final loanList = loansData
+            .whereType<Map>()
+            .map((e) {
+              try {
+                return _loanToModel(LoanEntity.fromJson(Map<String, dynamic>.from(e)));
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<LoanModel>()
+            .toList();
+        if (loanList.isNotEmpty) await isar.loanModels.putAll(loanList);
+      }
 
       // Import transactions
-      final txList = (map['transactions'] as List)
-          .map((e) => _transToModel(TransactionEntity.fromJson(Map<String, dynamic>.from(e))))
-          .toList();
-      await isar.transactionModels.putAll(txList);
+      final transactionsData = map['transactions'];
+      if (transactionsData is List) {
+        final txList = transactionsData
+            .whereType<Map>()
+            .map((e) {
+              try {
+                return _transToModel(TransactionEntity.fromJson(Map<String, dynamic>.from(e)));
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<TransactionModel>()
+            .toList();
+        if (txList.isNotEmpty) await isar.transactionModels.putAll(txList);
+      }
     });
   }
 
@@ -138,13 +228,13 @@ class DriveBackupService {
         return null;
       }
 
-      final file = await driveApi.files.get(fileId,
-          $fields: 'modifiedTime,size') as drive.File;
+      final dynamic file = await driveApi.files.get(fileId,
+          $fields: 'modifiedTime,size');
       
-      // We also want the counts if possible, but that requires downloading the file.
-      // For the quick "Last backup" info, size and time are enough.
-      // If we want counts, we'd need to fetch them from the metadata inside the file.
-      // Let's just return what we have from the file object for now.
+      if (file is! drive.File) {
+        client.close();
+        return null;
+      }
       
       client.close();
       return BackupMetadata(
@@ -189,7 +279,7 @@ class DriveBackupService {
     });
   }
 
-  // Mapper helpers (Copied/Adapted from ExportService)
+  // Mapper helpers
   static TransactionEntity _transToEntity(TransactionModel m) => TransactionEntity(
         uuid: m.uuid,
         title: m.title,

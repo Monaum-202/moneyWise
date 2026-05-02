@@ -2,11 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
+import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/analytics/presentation/providers/analytics_providers.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/balance_summary_card.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/recent_transactions_widget.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/top_categories_widget.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/upcoming_loans_widget.dart';
+import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
+import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/features/transactions/presentation/screens/add_transaction_sheet.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -50,7 +54,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final insights = ref.watch(insightsProvider);
+    final totalBalanceAsync = ref.watch(totalBalanceProvider);
+    final settings = ref.watch(settingsProvider).valueOrNull;
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
+
+    final hour = DateTime.now().hour;
+    final greeting = hour < 12 
+        ? 'Good morning' 
+        : hour < 17 
+            ? 'Good afternoon' 
+            : 'Good evening';
 
     return Scaffold(
       body: CustomScrollView(
@@ -60,7 +74,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             pinned: true,
             expandedHeight: 120.0,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 16),
+              titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 16, end: 16),
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,11 +87,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       fontFamily: 'Poppins',
                     ),
                   ),
-                  Text(
-                    'Good morning 👋',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '$greeting 👋',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      totalBalanceAsync.when(
+                        data: (balance) => Text(
+                          'Balance: $currencySymbol${balance.toStringAsFixed(0)}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
+                    ],
                   ),
                 ],
               ),
