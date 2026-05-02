@@ -63,14 +63,29 @@ class TransactionFormNotifier extends StateNotifier<TransactionEntity?> {
         createdAt: DateTime.now(),
       );
 
-  void initEdit(TransactionEntity t) => state = t;
+  void initEdit(TransactionEntity t) {
+    if (t.isRecurring && t.recurringType == RecurringType.none) {
+      state = t.copyWith(recurringType: RecurringType.daily);
+    } else {
+      state = t;
+    }
+  }
   void updateTitle(String v) => state = state?.copyWith(title: v);
   void updateAmount(double v) => state = state?.copyWith(amount: v);
   void updateType(TransactionType v) => state = state?.copyWith(type: v);
   void updateCategory(String id) => state = state?.copyWith(categoryId: id);
   void updateDate(DateTime d) => state = state?.copyWith(date: d);
   void updateNote(String v) => state = state?.copyWith(note: v);
-  void updateRecurring(bool v) => state = state?.copyWith(isRecurring: v);
+  void updateRecurring(bool v) {
+    if (state == null) return;
+    state = state!.copyWith(
+      isRecurring: v,
+      recurringType: v 
+          ? (state!.recurringType == RecurringType.none ? RecurringType.daily : state!.recurringType)
+          : RecurringType.none,
+    );
+  }
+
   void updateRecurringType(RecurringType v) => state = state?.copyWith(recurringType: v);
 
   Future<bool> save() async {
