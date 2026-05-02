@@ -8,6 +8,7 @@ import 'package:moneywise/core/utils/export_service.dart';
 import 'package:moneywise/core/utils/pdf_report_generator.dart';
 import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
+import 'package:moneywise/features/settings/presentation/widgets/google_backup_tile.dart';
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
@@ -121,6 +122,13 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.push('/pin-setup'),
               ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _Section(
+            title: 'CLOUD BACKUP',
+            children: [
+              const GoogleBackupTile(),
             ],
           ),
           const SizedBox(height: 24),

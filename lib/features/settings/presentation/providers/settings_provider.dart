@@ -17,6 +17,7 @@ class AppSettings with _$AppSettings {
     @Default(true) bool biometricEnabled,
     @Default(true) bool budgetAlertsEnabled,
     @Default(true) bool loanRemindersEnabled,
+    @Default(false) bool autoBackupEnabled,
   }) = _AppSettings;
   factory AppSettings.fromJson(Map<String, dynamic> json) => _$AppSettingsFromJson(json);
 }
@@ -43,6 +44,7 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
   Future<void> setBiometric(bool v) => _update((s) => s.copyWith(biometricEnabled: v));
   Future<void> setBudgetAlerts(bool v) => _update((s) => s.copyWith(budgetAlertsEnabled: v));
   Future<void> setLoanReminders(bool v) => _update((s) => s.copyWith(loanRemindersEnabled: v));
+  Future<void> setAutoBackup(bool v) => _update((s) => s.copyWith(autoBackupEnabled: v));
 
   Future<void> _update(AppSettings Function(AppSettings) updater) async {
     final current = state.valueOrNull ?? const AppSettings();
