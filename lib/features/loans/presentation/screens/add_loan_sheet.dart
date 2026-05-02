@@ -115,7 +115,13 @@ class _AddLoanSheetState extends ConsumerState<AddLoanSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Loan Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Loan Date',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         ActionChip(
                           avatar: const Icon(Icons.calendar_today_rounded, size: 14),
@@ -140,7 +146,13 @@ class _AddLoanSheetState extends ConsumerState<AddLoanSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Due Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Due Date',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         ActionChip(
                           avatar: const Icon(Icons.event_note_rounded, size: 14),

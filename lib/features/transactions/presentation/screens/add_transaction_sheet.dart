@@ -113,7 +113,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 onChanged: (control) => notifier.updateTitle(control.value ?? ''),
               ),
               const SizedBox(height: 24),
-              const Text('Category', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Category', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               CategoryPickerWidget(
                 selectedCategoryId: transaction.categoryId,
@@ -150,12 +150,14 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               if (transaction.isRecurring) ...[
                 const SizedBox(height: 12),
                 DropdownButtonFormField<RecurringType>(
-                  initialValue: transaction.recurringType,
+                  value: transaction.recurringType == RecurringType.none
+                      ? RecurringType.daily
+                      : transaction.recurringType,
                   decoration: const InputDecoration(labelText: 'Frequency'),
                   items: RecurringType.values.where((e) => e != RecurringType.none).map((type) {
                     return DropdownMenuItem(value: type, child: Text(type.name.toUpperCase()));
                   }).toList(),
-                  onChanged: (v) => notifier.updateRecurringType(v ?? RecurringType.none),
+                  onChanged: (v) => notifier.updateRecurringType(v ?? RecurringType.daily),
                 ),
               ],
               const SizedBox(height: 24),

@@ -51,7 +51,15 @@ class _AddRepaymentSheetState extends ConsumerState<AddRepaymentSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Add Repayment', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(
+              'Add Repayment',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
             const SizedBox(height: 24),
             AmountInputWidget(
               initialValue: 0,
