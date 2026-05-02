@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
@@ -11,7 +12,7 @@ class UpcomingLoansWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loanListAsync = ref.watch(loanListProvider);
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     return loanListAsync.when(
@@ -81,7 +82,7 @@ class UpcomingLoansWidget extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                '$currency${loan.amount.toStringAsFixed(0)}',
+                                '$currencySymbol${loan.amount.toStringAsFixed(0)}',
                                 style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
                               ),
                             ],
