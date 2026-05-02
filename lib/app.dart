@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneywise/core/constants/app_strings.dart';
 import 'package:moneywise/core/services/notification_service.dart';
+import 'package:moneywise/core/services/drive_backup_service.dart';
+import 'package:moneywise/core/services/google_auth_service.dart';
 import 'package:moneywise/core/theme/app_theme.dart';
 import 'package:moneywise/features/categories/presentation/providers/category_providers.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/routing/app_router.dart';
+import 'package:moneywise/shared/providers/isar_provider.dart';
 
 class MoneywiseApp extends ConsumerStatefulWidget {
   const MoneywiseApp({super.key});
@@ -23,9 +26,24 @@ class _MoneywiseAppState extends ConsumerState<MoneywiseApp> {
   void initState() {
     super.initState();
     _listener = AppLifecycleListener(
-      onHide: () => _backgroundTimestamp = DateTime.now(),
+      onHide: () {
+        _backgroundTimestamp = DateTime.now();
+        _handleBackgroundBackup();
+      },
       onResume: _handleResume,
     );
+  }
+
+  Future<void> _handleBackgroundBackup() async {
+    final isSignedIn = await GoogleAuthService.isSignedIn;
+    final settings = ref.read(settingsProvider).valueOrNull;
+    final autoBackup = settings?.autoBackupEnabled ?? false;
+
+    if (isSignedIn && autoBackup) {
+      final isar = ref.read(isarProvider);
+      // Fire and forget backup in background
+      DriveBackupService.backup(isar);
+    }
   }
 
   void _handleResume() {
