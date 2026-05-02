@@ -57,3 +57,7 @@ app.*.map.json
 # Private keys
 *.keystore
 *.jks
+
+# Add these lines to your .gitignore
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
