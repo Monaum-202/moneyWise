@@ -161,6 +161,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         },
         label: const Text('Add Transaction'),
         icon: const Icon(Icons.add_rounded),
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }

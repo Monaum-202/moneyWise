@@ -115,6 +115,8 @@ class LoansScreen extends ConsumerWidget {
         },
         label: const Text('Add Loan'),
         icon: const Icon(Icons.add_rounded),
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }

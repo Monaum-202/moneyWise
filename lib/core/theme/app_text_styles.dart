@@ -4,12 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTextStyles {
   AppTextStyles._();
 
-  static TextStyle get heading => GoogleFonts.poppins(
+  static TextStyle heading(BuildContext context) => GoogleFonts.poppins(
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: Theme.of(context).colorScheme.onSurface,
       );
 
-  static TextStyle get body => GoogleFonts.inter(
-        color: Colors.black,
+  static TextStyle body(BuildContext context) => GoogleFonts.inter(
+        color: Theme.of(context).colorScheme.onSurface,
       );
 }

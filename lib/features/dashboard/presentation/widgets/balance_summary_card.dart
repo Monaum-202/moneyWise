@@ -43,7 +43,7 @@ class BalanceSummaryCard extends ConsumerWidget {
             Text(
               'This Month',
               style: theme.textTheme.labelMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
                 letterSpacing: 1.2,
               ),
             ),
@@ -57,14 +57,14 @@ class BalanceSummaryCard extends ConsumerWidget {
                       TextSpan(
                         text: '$currencySymbol ',
                         style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
+                          color: theme.colorScheme.onPrimary,
                           fontWeight: FontWeight.normal,
                         ),
                       ),
                       TextSpan(
                         text: summary.netBalance.toStringAsFixed(0),
                         style: theme.textTheme.displaySmall?.copyWith(
-                          color: Colors.white,
+                          color: theme.colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins',
                         ),
@@ -76,13 +76,13 @@ class BalanceSummaryCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       'Saved ${summary.savingsRate.toStringAsFixed(0)}%',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -98,6 +98,7 @@ class BalanceSummaryCard extends ConsumerWidget {
                   symbol: currencySymbol,
                   icon: Icons.arrow_upward_rounded,
                   color: const Color(0xFF1D9E75),
+                  onColor: theme.colorScheme.onPrimary,
                 ),
                 const SizedBox(width: 16),
                 _SummaryChip(
@@ -105,7 +106,8 @@ class BalanceSummaryCard extends ConsumerWidget {
                   amount: summary.totalExpense,
                   symbol: currencySymbol,
                   icon: Icons.arrow_downward_rounded,
-                  color: const Color(0xFFE05C5C),
+                  color: theme.colorScheme.error,
+                  onColor: theme.colorScheme.onPrimary,
                 ),
               ],
             ),
@@ -125,6 +127,7 @@ class _SummaryChip extends StatelessWidget {
     required this.symbol,
     required this.icon,
     required this.color,
+    required this.onColor,
   });
 
   final String label;
@@ -132,6 +135,7 @@ class _SummaryChip extends StatelessWidget {
   final String symbol;
   final IconData icon;
   final Color color;
+  final Color onColor;
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +143,7 @@ class _SummaryChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
+          color: onColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -156,22 +160,22 @@ class _SummaryChip extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                    style: TextStyle(color: onColor.withValues(alpha: 0.7), fontSize: 10),
                   ),
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
                           text: symbol,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: onColor,
                             fontSize: 10,
                           ),
                         ),
                         TextSpan(
                           text: amount.toStringAsFixed(0),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: onColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),

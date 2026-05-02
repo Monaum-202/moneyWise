@@ -16,9 +16,14 @@ class CashflowBarChart extends ConsumerWidget {
     return barDataAsync.when(
       data: (data) {
         if (data.isEmpty) {
-          return const SizedBox(
+          return SizedBox(
             height: 200,
-            child: Center(child: Text('No data for this period')),
+            child: Center(
+              child: Text(
+                'No data for this period',
+                style: TextStyle(color: theme.colorScheme.outline),
+              ),
+            ),
           );
         }
 
@@ -56,7 +61,10 @@ class CashflowBarChart extends ConsumerWidget {
                       final parts = dateStr.split('-');
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
-                        child: Text('${parts[2]}/${parts[1]}', style: const TextStyle(fontSize: 10)),
+                        child: Text(
+                          '${parts[2]}/${parts[1]}',
+                          style: TextStyle(fontSize: 10, color: theme.colorScheme.outline),
+                        ),
                       );
                     },
                   ),
@@ -83,7 +91,7 @@ class CashflowBarChart extends ConsumerWidget {
                     ),
                     BarChartRodData(
                       toY: expense,
-                      color: const Color(0xFFE05C5C),
+                      color: theme.colorScheme.error,
                       width: 8,
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                     ),
@@ -95,7 +103,7 @@ class CashflowBarChart extends ConsumerWidget {
         );
       },
       loading: () => const ShimmerCard(height: 200),
-      error: (e, s) => Center(child: Text('Error: $e')),
+      error: (e, s) => Center(child: Text('Error: $e', style: TextStyle(color: theme.colorScheme.error))),
     );
   }
 

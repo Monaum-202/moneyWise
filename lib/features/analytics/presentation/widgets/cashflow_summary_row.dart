@@ -30,7 +30,7 @@ class CashFlowSummaryRow extends ConsumerWidget {
               label: 'Total Out',
               amount: summary.totalExpense,
               symbol: currencySymbol,
-              color: const Color(0xFFE05C5C),
+              color: theme.colorScheme.error,
             ),
             const SizedBox(width: 8),
             _SummaryChip(

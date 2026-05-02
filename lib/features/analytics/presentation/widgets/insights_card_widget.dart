@@ -19,7 +19,7 @@ class InsightCardWidget extends StatelessWidget {
       color = const Color(0xFF1D9E75);
       icon = Icons.savings_rounded;
     } else if (insight.contains('spent more') || insight.contains('Review')) {
-      color = const Color(0xFFE05C5C);
+      color = theme.colorScheme.error;
       icon = Icons.trending_up_rounded;
     }
 

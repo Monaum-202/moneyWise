@@ -64,8 +64,14 @@ class TopCategoriesWidget extends ConsumerWidget {
                             RichText(
                               text: TextSpan(
                                 children: [
-                                  TextSpan(text: '$currencySymbol ', style: const TextStyle(color: Colors.grey, fontSize: 10)),
-                                  TextSpan(text: t.total.toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                                  TextSpan(text: '$currencySymbol ', style: TextStyle(color: theme.colorScheme.outline, fontSize: 10)),
+                                  TextSpan(
+                                    text: t.total.toStringAsFixed(0),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

@@ -23,9 +23,9 @@ class TrendLineChart extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.show_chart_rounded, size: 48, color: Colors.grey),
-                SizedBox(height: 16),
-                Text('No trend data available'),
+                Icon(Icons.show_chart_rounded, size: 48, color: theme.colorScheme.outline),
+                const SizedBox(height: 16),
+                Text('No trend data available', style: TextStyle(color: theme.colorScheme.outline)),
               ],
             ),
           );
@@ -57,8 +57,14 @@ class TrendLineChart extends ConsumerWidget {
                   color: const Color(0xFFE05C5C),
                   barWidth: 3,
                   isStrokeCapRound: true,
-                  dotData: const FlDotData(
-                    getDotPainter: _getDotPainter,
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, xPercentage, bar, index) => FlDotCirclePainter(
+                      radius: 3,
+                      color: theme.colorScheme.surface,
+                      strokeWidth: 2,
+                      strokeColor: const Color(0xFFE05C5C),
+                    ),
                   ),
                   belowBarData: BarAreaData(
                     show: true,
@@ -96,15 +102,6 @@ class TrendLineChart extends ConsumerWidget {
       },
       loading: () => const SizedBox(height: 200),
       error: (e, s) => const SizedBox.shrink(),
-    );
-  }
-
-  static FlDotPainter _getDotPainter(FlSpot spot, double xPercentage, LineChartBarData bar, int index) {
-    return FlDotCirclePainter(
-      radius: 3,
-      color: Colors.white,
-      strokeWidth: 2,
-      strokeColor: const Color(0xFFE05C5C),
     );
   }
 }

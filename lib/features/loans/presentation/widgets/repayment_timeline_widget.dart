@@ -138,7 +138,7 @@ class RepaymentTimelineWidget extends ConsumerWidget {
               if (r.note != null && r.note!.isNotEmpty)
                 Text(
                   r.note!,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                 ),
               const SizedBox(height: 16),
             ],

@@ -216,11 +216,11 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
                           ),
                           TextSpan(
                             text: remaining.toStringAsFixed(0),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 32,
                               fontFamily: 'Poppins',
-                              color: Colors.black,
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                         ],

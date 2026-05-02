@@ -82,11 +82,15 @@ class LoanCardWidget extends ConsumerWidget {
                             children: [
                               TextSpan(
                                 text: currencySymbol,
-                                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                               ),
                               TextSpan(
                                 text: loan.amount.toStringAsFixed(0),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: theme.colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -119,21 +123,21 @@ class LoanCardWidget extends ConsumerWidget {
 
   Widget _buildStatusRow(ThemeData theme) {
     if (loan.isPaid) {
-      return const OverdueBadgeWidget(
+      return OverdueBadgeWidget(
         label: 'Settled ✓',
-        bg: Color(0xFFE8F5E9),
-        text: Color(0xFF1D9E75),
+        bg: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+        text: theme.colorScheme.onPrimaryContainer,
       );
     }
 
     if (loan.dueDate == null) {
       return Row(
         children: [
-          const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey),
+          Icon(Icons.calendar_today_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant),
           const SizedBox(width: 4),
           Text(
             DateFormatter.format(loan.date),
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
         ],
       );
@@ -143,26 +147,26 @@ class LoanCardWidget extends ConsumerWidget {
     final difference = loan.dueDate!.difference(now).inDays;
 
     if (difference < 0) {
-      return const OverdueBadgeWidget(
+      return OverdueBadgeWidget(
         label: 'Overdue',
-        bg: Color(0xFFFFEBEE),
-        text: Color(0xFFE05C5C),
+        bg: theme.colorScheme.errorContainer.withValues(alpha: 0.5),
+        text: theme.colorScheme.onErrorContainer,
       );
     } else if (difference <= 3) {
-      return const OverdueBadgeWidget(
+      return OverdueBadgeWidget(
         label: 'Due soon',
-        bg: Color(0xFFFFF3E0),
+        bg: Colors.orange.withValues(alpha: 0.2),
         text: Colors.orange,
       );
     }
 
     return Row(
       children: [
-        const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey),
+        Icon(Icons.calendar_today_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant),
         const SizedBox(width: 4),
         Text(
           DateFormatter.format(loan.dueDate!),
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+          style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
       ],
     );
