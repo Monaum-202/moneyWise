@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/icon_helper.dart';
 import 'package:moneywise/features/categories/domain/category_model.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
@@ -19,7 +20,7 @@ class CategoryCardWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     
     final theme = Theme.of(context);
     
@@ -81,7 +82,7 @@ class CategoryCardWidget extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '$currency${spentThisMonth.toStringAsFixed(0)}',
+                '$currencySymbol${spentThisMonth.toStringAsFixed(0)}',
                 style: TextStyle(
                   color: progressColor,
                   fontSize: 12,

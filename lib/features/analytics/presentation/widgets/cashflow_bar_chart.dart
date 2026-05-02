@@ -2,7 +2,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/analytics/presentation/providers/analytics_providers.dart';
+import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/shared/widgets/loading_shimmer.dart';
 
 class CashflowBarChart extends ConsumerWidget {
@@ -11,6 +13,8 @@ class CashflowBarChart extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final barDataAsync = ref.watch(barChartDataProvider);
+    final settings = ref.watch(settingsProvider).valueOrNull;
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     return barDataAsync.when(
@@ -42,7 +46,7 @@ class CashflowBarChart extends ConsumerWidget {
                     final income = data[groupIndex].income;
                     final expense = data[groupIndex].expense;
                     return BarTooltipItem(
-                      'Income: ৳${income.toStringAsFixed(0)}\nExpense: ৳${expense.toStringAsFixed(0)}',
+                      'Income: $currencySymbol${income.toStringAsFixed(0)}\nExpense: $currencySymbol${expense.toStringAsFixed(0)}',
                       TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold),
                     );
                   },

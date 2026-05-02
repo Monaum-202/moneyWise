@@ -43,7 +43,7 @@ class BalanceSummaryCard extends ConsumerWidget {
             Text(
               'This Month',
               style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                color: Colors.white.withValues(alpha: 0.9),
                 letterSpacing: 1.2,
               ),
             ),
@@ -57,14 +57,14 @@ class BalanceSummaryCard extends ConsumerWidget {
                       TextSpan(
                         text: '$currencySymbol ',
                         style: theme.textTheme.titleLarge?.copyWith(
-                          color: theme.colorScheme.onPrimary,
+                          color: Colors.white,
                           fontWeight: FontWeight.normal,
                         ),
                       ),
                       TextSpan(
                         text: summary.netBalance.toStringAsFixed(0),
                         style: theme.textTheme.displaySmall?.copyWith(
-                          color: theme.colorScheme.onPrimary,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Poppins',
                         ),
@@ -76,13 +76,13 @@ class BalanceSummaryCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       'Saved ${summary.savingsRate.toStringAsFixed(0)}%',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onPrimary,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -98,7 +98,7 @@ class BalanceSummaryCard extends ConsumerWidget {
                   symbol: currencySymbol,
                   icon: Icons.arrow_upward_rounded,
                   color: const Color(0xFF1D9E75),
-                  onColor: theme.colorScheme.onPrimary,
+                  onColor: Colors.white,
                 ),
                 const SizedBox(width: 16),
                 _SummaryChip(
@@ -107,7 +107,7 @@ class BalanceSummaryCard extends ConsumerWidget {
                   symbol: currencySymbol,
                   icon: Icons.arrow_downward_rounded,
                   color: theme.colorScheme.error,
-                  onColor: theme.colorScheme.onPrimary,
+                  onColor: Colors.white,
                 ),
               ],
             ),
