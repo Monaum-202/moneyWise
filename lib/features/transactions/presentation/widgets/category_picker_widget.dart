@@ -14,6 +14,7 @@ class CategoryPickerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final categoriesAsync = ref.watch(categoryListProvider);
 
     return categoriesAsync.when(
@@ -33,14 +34,14 @@ class CategoryPickerWidget extends ConsumerWidget {
                 avatar: Icon(
                   IconHelper.getIcon(category.iconCodePoint),
                   size: 16,
-                  color: isSelected ? Colors.white : Color(category.colorValue),
+                  color: isSelected ? theme.colorScheme.onPrimary : Color(category.colorValue),
                 ),
                 selected: isSelected,
                 onSelected: (_) => onSelected(category.uuid),
                 selectedColor: Color(category.colorValue),
-                checkmarkColor: Colors.white,
+                checkmarkColor: theme.colorScheme.onPrimary,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ).animate(target: isSelected ? 1 : 0).scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05)),

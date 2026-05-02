@@ -20,9 +20,14 @@ class CategoryDonutChart extends ConsumerWidget {
     final totalExpense = pieData.fold(0.0, (sum, item) => sum + item.value);
 
     if (totalExpense == 0) {
-      return const SizedBox(
+      return SizedBox(
         height: 300,
-        child: Center(child: Text('No expenses this period')),
+        child: Center(
+          child: Text(
+            'No expenses this period',
+            style: TextStyle(color: theme.colorScheme.outline),
+          ),
+        ),
       );
     }
 
@@ -126,6 +131,7 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -133,12 +139,15 @@ class _LegendItem extends StatelessWidget {
         const SizedBox(width: 8),
         RichText(
           text: TextSpan(
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black),
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface,
+            ),
             children: [
               TextSpan(text: '$label • '),
-              TextSpan(text: '$symbol ', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              TextSpan(text: '$symbol ', style: TextStyle(fontSize: 10, color: theme.colorScheme.outline)),
               TextSpan(text: amount.toStringAsFixed(0)),
-              TextSpan(text: ' (${percentage.toStringAsFixed(0)}%)', style: const TextStyle(color: Colors.grey, fontSize: 10)),
+              TextSpan(text: ' (${percentage.toStringAsFixed(0)}%)', style: TextStyle(color: theme.colorScheme.outline, fontSize: 10)),
             ],
           ),
         ),

@@ -62,7 +62,9 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
               return CategoryCardWidget(
                 category: category,
                 spentThisMonth: categoryTotalsAsync.maybeWhen(
-                  data: (totals) => totals.firstWhere((t) => t.categoryId == category.uuid, orElse: () => throw Exception()).total,
+                  data: (totals) {
+                    return totals.where((t) => t.categoryId == category.uuid).firstOrNull?.total ?? 0.0;
+                  },
                   orElse: () => 0.0,
                 ),
                 onTap: () {
