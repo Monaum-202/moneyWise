@@ -37,7 +37,6 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
     final loanListAsync = ref.watch(loanListProvider);
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
 
     return loanListAsync.when(
       data: (loans) {
@@ -92,9 +91,9 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
                       IconButton(
                         icon: const Icon(Icons.share_outlined),
                         onPressed: () {
-                          final text = "Loan to ${loan.personName}: $currency${loan.amount.toStringAsFixed(0)} | "
+                          final text = "Loan to ${loan.personName}: $currencySymbol${loan.amount.toStringAsFixed(0)} | "
                               "Due: ${loan.dueDate != null ? DateFormatter.format(loan.dueDate!) : 'N/A'} | "
-                              "Repaid: $currency${totalRepaid.toStringAsFixed(0)} ($currency${remaining.toStringAsFixed(0)} remaining)";
+                              "Repaid: $currencySymbol${totalRepaid.toStringAsFixed(0)} ($currencySymbol${remaining.toStringAsFixed(0)} remaining)";
                           Share.share(text);
                         },
                       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/loans/presentation/screens/add_loan_sheet.dart';
 import 'package:moneywise/features/loans/presentation/widgets/loan_card_widget.dart';
@@ -17,7 +18,7 @@ class LoansScreen extends ConsumerWidget {
     final summaryAsync = ref.watch(loanSummaryProvider);
     final filter = ref.watch(loanFilterProvider);
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final currency = settings?.currency ?? '৳';
+    final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -35,7 +36,7 @@ class LoansScreen extends ConsumerWidget {
                     child: _SummaryCard(
                       label: 'To Receive',
                       amount: summary.totalGave,
-                      currency: currency,
+                      currency: currencySymbol,
                       color: const Color(0xFF1D9E75),
                     ),
                   ),
@@ -44,7 +45,7 @@ class LoansScreen extends ConsumerWidget {
                     child: _SummaryCard(
                       label: 'To Pay',
                       amount: summary.totalTook,
-                      currency: currency,
+                      currency: currencySymbol,
                       color: const Color(0xFFE05C5C),
                     ),
                   ),

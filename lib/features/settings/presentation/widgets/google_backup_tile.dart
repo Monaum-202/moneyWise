@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:moneywise/core/services/backup_providers.dart';
 import 'package:moneywise/core/services/drive_backup_result.dart';
+import 'package:moneywise/features/loans/domain/loan_model.dart';
+import 'package:moneywise/features/transactions/domain/transaction_model.dart';
+import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/settings/presentation/widgets/restore_dialog.dart';
 
@@ -41,6 +44,40 @@ class GoogleBackupTile extends ConsumerWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Signed in as $email ✓')),
                     );
+
+                    // Check if we should suggest a restore (fresh install scenario)
+                    final isar = ref.read(isarProvider);
+                    final tCount = await isar.transactionModels.count();
+                    final lCount = await isar.loanModels.count();
+
+                    if (tCount == 0 && lCount == 0) {
+                      final backupInfo = await ref.refresh(lastBackupInfoProvider.future);
+                      if (backupInfo != null && context.mounted) {
+                        // Show restore suggestion
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Backup Found'),
+                            content: const Text(
+                                'A backup exists on Google Drive but your local app is empty. Would you like to restore your data now?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('No, keep empty'),
+                              ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Yes, Restore'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (result == true && context.mounted) {
+                          showRestoreDialog(context, ref);
+                        }
+                      }
+                    }
                   }
                 },
                 child: const Text('Sign In'),
