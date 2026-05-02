@@ -69,7 +69,6 @@ class TrendLineChart extends ConsumerWidget {
                     ),
                   ),
                   belowBarData: BarAreaData(
-                    show: true,
                     color: const Color(0xFFE05C5C).withValues(alpha: 0.1),
                   ),
                 ),

@@ -94,7 +94,9 @@ class _LoadingBackupDialogState extends ConsumerState<_LoadingBackupDialog> {
   @override
   void initState() {
     super.initState();
-    _fetch();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetch();
+    });
   }
 
   Future<void> _fetch() async {

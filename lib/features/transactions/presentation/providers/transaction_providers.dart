@@ -37,6 +37,12 @@ final monthlySummaryProvider = StreamProvider<TransactionSummary>((ref) {
   return repo.watchSummary(from, to);
 });
 
+// Total balance across all time
+final totalBalanceProvider = StreamProvider<double>((ref) {
+  final repo = ref.watch(transactionRepositoryProvider);
+  return repo.watchSummary(DateTime(2000), DateTime(2100)).map((s) => s.netBalance);
+});
+
 // Category totals for charts
 final categoryTotalsProvider = StreamProvider<List<CategoryTotal>>((ref) {
   final repo = ref.watch(transactionRepositoryProvider);
