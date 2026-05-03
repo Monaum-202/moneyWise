@@ -3,17 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moneywise/core/utils/currency_formatter.dart';
 import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
-import 'package:moneywise/features/loans/presentation/providers/loan_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
+import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/features/transactions/presentation/widgets/amount_input_widget.dart';
+import 'package:moneywise/shared/enums/loan_type.dart';
+import 'package:moneywise/shared/enums/recurring_type.dart';
+import 'package:moneywise/shared/enums/transaction_type.dart';
+import 'package:moneywise/shared/providers/repository_providers.dart';
+import 'package:uuid/uuid.dart';
 
 class AddRepaymentSheet extends ConsumerStatefulWidget {
 
   const AddRepaymentSheet({
-    required this.loanUuid, required this.totalLoan, required this.alreadyRepaid, super.key,
+    required this.loan, required this.alreadyRepaid, super.key,
   });
-  final String loanUuid;
-  final double totalLoan;
+  final LoanEntity loan;
   final double alreadyRepaid;
 
   @override
@@ -36,7 +40,7 @@ class _AddRepaymentSheetState extends ConsumerState<AddRepaymentSheet> {
     final settings = ref.watch(settingsProvider).valueOrNull;
     final currencySymbol = CurrencyFormatter.getSymbol(settings?.currency ?? 'BDT');
     final theme = Theme.of(context);
-    final remaining = widget.totalLoan - widget.alreadyRepaid - _amount;
+    final remaining = widget.loan.amount - widget.alreadyRepaid - _amount;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -119,18 +123,70 @@ class _AddRepaymentSheetState extends ConsumerState<AddRepaymentSheet> {
             ElevatedButton(
               onPressed: _amount <= 0 ? null : () async {
                 final repayment = RepaymentEntity(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  id: const Uuid().v4(),
                   amount: _amount,
                   date: _date,
                   note: _noteController.text,
                 );
                 
-                final success = await ref.read(loanFormProvider.notifier).addRepayment(repayment);
-                if (success && mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Repayment added ✓')),
+                try {
+                  final loanRepo = ref.read(loanRepositoryProvider);
+                  final transRepo = ref.read(transactionRepositoryProvider);
+                  final catRepo = ref.read(categoryRepositoryProvider);
+
+                  // 1. Add repayment to loan
+                  await loanRepo.addRepayment(widget.loan.uuid, repayment);
+                  
+                  // 2. Add as a transaction
+                  final categories = await catRepo.watchAll().first;
+                  final otherCategory = categories.firstWhere(
+                    (c) => c.name.toLowerCase() == 'other',
+                    orElse: () => categories.first,
                   );
+
+                  final transaction = TransactionEntity(
+                    uuid: const Uuid().v4(),
+                    title: 'Repayment: ${widget.loan.personName}',
+                    amount: _amount,
+                    type: widget.loan.type == LoanType.took 
+                        ? TransactionType.expense 
+                        : TransactionType.income,
+                    categoryId: otherCategory.uuid,
+                    date: _date,
+                    isRecurring: false,
+                    recurringType: RecurringType.none,
+                    createdAt: DateTime.now(),
+                    note: _noteController.text.isEmpty 
+                        ? 'Loan repayment' 
+                        : _noteController.text,
+                  );
+                  await transRepo.add(transaction);
+
+                  // 3. Automatically mark as settled if fully repaid
+                  if (remaining <= 0) {
+                    await loanRepo.markSettled(widget.loan.uuid);
+                  }
+
+                  if (mounted) {
+                    final navigator = Navigator.of(context);
+                    final messenger = ScaffoldMessenger.of(context);
+                    
+                    navigator.pop();
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(remaining <= 0 
+                          ? 'Repayment added & Loan settled ✓' 
+                          : 'Repayment added & Transaction recorded ✓'),
+                        backgroundColor: const Color(0xFF1D9E75),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(
