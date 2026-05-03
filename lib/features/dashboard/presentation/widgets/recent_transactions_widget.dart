@@ -30,8 +30,17 @@ class RecentTransactionsWidget extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => context.go('/transactions'),
-                child: const Text('See all →'),
-              ),
+                child: Text(
+                  'See all →',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                  ),
+                ), // Added missing )
+              ), // Added missing )
             ],
           ),
         ),
