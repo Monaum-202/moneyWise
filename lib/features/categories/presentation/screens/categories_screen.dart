@@ -90,6 +90,8 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         },
         label: const Text('Add Category'),
         icon: const Icon(Icons.add_rounded),
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }

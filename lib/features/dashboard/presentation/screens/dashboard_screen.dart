@@ -82,7 +82,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Text(
                     'Moneywise',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: theme.colorScheme.primary,
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white
+                          : theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Poppins',
                     ),
@@ -100,7 +102,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         data: (balance) => Text(
                           'Balance: $currencySymbol${balance.toStringAsFixed(0)}',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.primary,
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white
+                                : theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -191,7 +195,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         },
         label: const Text('Add Transaction'),
         icon: const Icon(Icons.add_rounded),
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        foregroundColor: Colors.white,
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );

@@ -157,8 +157,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
                                 context: context,
                                 isScrollControlled: true,
                                 builder: (context) => AddRepaymentSheet(
-                                  loanUuid: loan.uuid,
-                                  totalLoan: loan.amount,
+                                  loan: loan,
                                   alreadyRepaid: totalRepaid,
                                 ),
                               );
