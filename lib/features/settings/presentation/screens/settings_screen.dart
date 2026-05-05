@@ -9,6 +9,7 @@ import 'package:moneywise/core/utils/pdf_report_generator.dart';
 import 'package:moneywise/features/budget/presentation/providers/budget_providers.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
 import 'package:moneywise/features/settings/presentation/widgets/google_backup_tile.dart';
+import 'package:moneywise/features/sms/providers/sms_providers.dart';
 import 'package:moneywise/features/transactions/domain/transaction_model.dart';
 import 'package:moneywise/shared/providers/isar_provider.dart';
 import 'package:moneywise/shared/providers/repository_providers.dart';
@@ -171,6 +172,33 @@ class SettingsScreen extends ConsumerWidget {
                 value: settings.loanRemindersEnabled,
                 onChanged: (v) => ref.read(settingsProvider.notifier).setLoanReminders(v),
               ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _Section(
+            title: 'SMS AUTO-DETECTION',
+            children: [
+              SwitchListTile(
+                title: const Text('Enable SMS Detection'),
+                subtitle: const Text('Automatically detect transaction SMS from banks'),
+                value: ref.watch(smsTrackingNotifierProvider),
+                onChanged: (v) {
+                  if (v) {
+                    ref.read(smsTrackingNotifierProvider.notifier).enable();
+                  } else {
+                    ref.read(smsTrackingNotifierProvider.notifier).disable();
+                  }
+                },
+              ),
+              if (ref.watch(smsTrackingNotifierProvider))
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextButton.icon(
+                    onPressed: () => context.push('/sms-import'),
+                    icon: const Icon(Icons.history_rounded),
+                    label: const Text('Import past 90 days'),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 24),

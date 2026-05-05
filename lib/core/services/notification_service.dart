@@ -2,7 +2,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:moneywise/core/utils/currency_formatter.dart';
+import 'package:moneywise/core/services/sms_parser.dart';
 import 'package:moneywise/features/loans/domain/loan_model.dart';
+import 'package:moneywise/shared/enums/transaction_type.dart';
 
 class NotificationService {
   static final _notificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -89,6 +91,38 @@ class NotificationService {
         ),
         iOS: DarwinNotificationDetails(),
       ),
+    );
+  }
+
+  static Future<void> showNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    await _notificationsPlugin.show(
+      id: title.hashCode,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'sms_transactions',
+          'SMS Transactions',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      payload: payload,
+    );
+  }
+
+  static Future<void> showSmsTransactionAlert(ParsedSmsTransaction t) async {
+    final emoji = t.type == TransactionType.expense ? '💸' : '💰';
+    final word = t.type == TransactionType.expense ? 'Spent' : 'Received';
+    await showNotification(
+      title: '$emoji $word ৳${t.amount.toStringAsFixed(0)} via ${t.bankName}',
+      body: 'Tap to add this to Moneywise',
+      payload: 'sms_transaction',
     );
   }
 

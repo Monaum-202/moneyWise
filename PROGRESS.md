@@ -68,3 +68,8 @@
 | Settings | /settings | ✓ |
 | Lock | /lock | ✓ |
 | PIN Setup | /pin-setup | ✓ |
+
+## SMS Auto-Detection ✓
+- [x] Part 1: Parser (bKash, Nagad, DBBL, Rocket, IBBL)
+- [x] Part 2: Live listener + providers + settings
+- [x] Part 3: Confirmation card + bulk import screen

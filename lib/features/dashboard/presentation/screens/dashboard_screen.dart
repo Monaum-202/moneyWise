@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moneywise/core/utils/currency_formatter.dart';
-import 'package:moneywise/core/utils/date_formatter.dart';
 import 'package:moneywise/features/analytics/presentation/providers/analytics_providers.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/balance_summary_card.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/recent_transactions_widget.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/top_categories_widget.dart';
 import 'package:moneywise/features/dashboard/presentation/widgets/upcoming_loans_widget.dart';
 import 'package:moneywise/features/settings/presentation/providers/settings_provider.dart';
+import 'package:moneywise/features/sms/presentation/widgets/sms_confirmation_card.dart';
+import 'package:moneywise/features/sms/providers/sms_providers.dart';
 import 'package:moneywise/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:moneywise/features/transactions/presentation/screens/add_transaction_sheet.dart';
 
@@ -133,6 +134,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ],
           ),
+          Consumer(builder: (context, ref, _) {
+            final pending = ref.watch(pendingSmsProvider);
+            if (pending.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+            return SliverToBoxAdapter(
+              child: Column(
+                children: pending.map((parsed) => Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: SmsConfirmationCard(
+                    parsed: parsed,
+                    onDismiss: () => ref
+                      .read(smsTrackingNotifierProvider.notifier)
+                      .dismissTransaction(parsed),
+                    onConfirm: (catId) => ref
+                      .read(smsTrackingNotifierProvider.notifier)
+                      .confirmTransaction(parsed, catId),
+                  ),
+                )).toList(),
+              ),
+            );
+          }),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

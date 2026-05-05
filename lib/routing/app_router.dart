@@ -10,6 +10,7 @@ import 'package:moneywise/features/loans/presentation/screens/loans_screen.dart'
 import 'package:moneywise/features/settings/presentation/screens/lock_screen.dart';
 import 'package:moneywise/features/settings/presentation/screens/pin_setup_screen.dart';
 import 'package:moneywise/features/settings/presentation/screens/settings_screen.dart';
+import 'package:moneywise/features/sms/presentation/screens/sms_import_screen.dart';
 import 'package:moneywise/features/transactions/presentation/screens/transactions_screen.dart';
 import 'package:moneywise/routing/route_names.dart';
 import 'package:moneywise/shared/widgets/app_bottom_nav.dart';
@@ -70,6 +71,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/budget',
             name: 'budget',
             builder: (context, state) => const BudgetScreen(),
+          ),
+          GoRoute(
+            path: '/sms-import',
+            name: 'sms-import',
+            builder: (context, state) => const SmsImportScreen(),
           ),
         ],
       ),
